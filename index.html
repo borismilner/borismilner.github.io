@@ -1,1 +1,559 @@
-"Hello World" 
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Boris Milner — Software Engineer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Boris Milner builds developer tools that run quietly in the background and speak up exactly when it matters: grabbit, qq, and snapper.">
+<meta name="theme-color" content="#14171c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: #14171c;
+    --panel: #1b2027;
+    --panel-raised: #202631;
+    --hairline: #2a313c;
+    --paper: #edeae2;
+    --muted: #8b93a0;
+    --signal: #e8a33d;
+    --live: #4fa6a0;
+    --radius: 3px;
+    --measure: 720px;
+  }
+
+  *, *::before, *::after{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior: auto; }
+  }
+
+  body{
+    margin: 0;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a{ color: inherit; }
+  a:focus-visible, button:focus-visible{
+    outline: 2px solid var(--signal);
+    outline-offset: 3px;
+  }
+
+  .mono{ font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+  .wrap{
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  @media (max-width: 640px){
+    .wrap{ padding: 0 20px; }
+  }
+
+  /* ---------- top nav ---------- */
+  .nav{
+    padding: 28px 0;
+  }
+  .nav .wrap{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .nav-mark{
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+  .nav-links{
+    display: flex;
+    gap: 24px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 13px;
+  }
+  .nav-links a{
+    text-decoration: none;
+    color: var(--muted);
+    border-bottom: 1px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .nav-links a:hover{
+    color: var(--paper);
+    border-color: var(--hairline);
+  }
+
+  /* ---------- hero ---------- */
+  .hero{
+    padding: 64px 0 88px;
+  }
+  .hero h1{
+    font-size: clamp(2.4rem, 5vw, 3.4rem);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0 0 20px;
+    max-width: 14ch;
+  }
+  .hero p.lede{
+    max-width: var(--measure);
+    font-size: 1.15rem;
+    color: var(--muted);
+    margin: 0 0 44px;
+  }
+  .hero p.lede strong{
+    color: var(--paper);
+    font-weight: 500;
+  }
+
+  .hero, .status-row{
+    opacity: 0;
+    transform: translateY(14px);
+    animation: rise 0.6s ease forwards;
+  }
+  .hero{ animation-delay: 0s; }
+  @keyframes rise{
+    to{ opacity: 1; transform: translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .hero, .status-row{
+      opacity: 1; transform: none; animation: none;
+    }
+  }
+
+  /* ---------- status board (signature element) ---------- */
+  .board{
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    background: var(--panel);
+    overflow: hidden;
+  }
+  .status-row{
+    display: grid;
+    grid-template-columns: 20px 1fr auto auto;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    text-decoration: none;
+    color: var(--paper);
+    border-bottom: 1px solid var(--hairline);
+    transition: background 0.15s ease;
+  }
+  .status-row:last-child{ border-bottom: none; }
+  .status-row:hover{ background: var(--panel-raised); }
+  .status-row:nth-child(1){ animation-delay: 0.15s; }
+  .status-row:nth-child(2){ animation-delay: 0.25s; }
+  .status-row:nth-child(3){ animation-delay: 0.35s; }
+
+  .dot{
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--dot-color, var(--live));
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--dot-color, var(--live)) 22%, transparent);
+    animation: breathe 2.6s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .dot{ animation: none; }
+  }
+  @keyframes breathe{
+    0%, 100%{ opacity: 1; }
+    50%{ opacity: 0.45; }
+  }
+
+  .status-name{ font-weight: 600; }
+  .status-verb{
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .status-state{
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--dot-color, var(--live));
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 560px){
+    .status-row{ grid-template-columns: 16px 1fr; row-gap: 4px; }
+    .status-verb, .status-state{ grid-column: 2; }
+  }
+
+  /* ---------- section scaffolding ---------- */
+  section{ padding: 88px 0; }
+  .section-head{
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    border-bottom: 1px solid var(--hairline);
+    padding-bottom: 16px;
+  }
+  .section-head h2{
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .section-head .count{
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* ---------- features ---------- */
+  .feature{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    padding: 40px 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .feature:last-child{ border-bottom: none; }
+  .feature.flip .feature-copy{ order: 2; }
+  .feature.flip .feature-meta{ order: 1; }
+
+  @media (max-width: 760px){
+    .feature{ grid-template-columns: 1fr; gap: 20px; }
+    .feature.flip .feature-copy, .feature .feature-copy{ order: 2; }
+    .feature.flip .feature-meta, .feature .feature-meta{ order: 1; }
+  }
+
+  .feature-meta{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 4px;
+  }
+  .feature-eyebrow{
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--dot-color, var(--live));
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .feature-meta h3{
+    font-size: 1.7rem;
+    margin: 0 0 12px;
+    font-weight: 700;
+  }
+  .feature-meta .thesis{
+    color: var(--muted);
+    margin: 0 0 20px;
+  }
+  .feature-link{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 13px;
+    text-decoration: none;
+    color: var(--paper);
+    border-bottom: 1px solid var(--dot-color, var(--live));
+    width: fit-content;
+    padding-bottom: 2px;
+  }
+  .feature-link .arrow{ transition: transform 0.15s ease; }
+  .feature-link:hover .arrow{ transform: translateX(3px); }
+
+  .feature-copy{
+    background: var(--panel);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    padding: 28px;
+  }
+  .feature-copy ul{
+    margin: 0 0 20px;
+    padding-left: 20px;
+    color: var(--paper);
+  }
+  .feature-copy li{ margin-bottom: 10px; }
+  .feature-copy li:last-child{ margin-bottom: 0; }
+  .feature-copy li::marker{ color: var(--dot-color, var(--live)); }
+
+  .badges{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--hairline);
+  }
+  .badge{
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    border: 1px solid var(--hairline);
+    border-radius: 100px;
+    padding: 4px 10px;
+  }
+
+  /* ---------- archive ---------- */
+  .archive-list{
+    border-top: 1px solid var(--hairline);
+  }
+  .archive-item{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--hairline);
+    text-decoration: none;
+    color: var(--paper);
+  }
+  .archive-name{ font-weight: 600; }
+  .archive-desc{
+    color: var(--muted);
+    font-size: 0.9rem;
+    flex: 1;
+    padding: 0 16px;
+  }
+  .archive-go{
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+    transition: color 0.15s ease;
+  }
+  .archive-item:hover .archive-go{ color: var(--live); }
+
+  @media (max-width: 640px){
+    .archive-item{ flex-wrap: wrap; }
+    .archive-desc{ flex-basis: 100%; padding: 4px 0 0; order: 3; }
+  }
+
+  .archive-note{
+    margin: 20px 0 0;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .archive-note a{ color: var(--muted); text-decoration: underline; text-underline-offset: 2px; }
+  .archive-note a:hover{ color: var(--paper); }
+
+  /* ---------- footer ---------- */
+  footer{
+    padding: 56px 0 72px;
+    border-top: 1px solid var(--hairline);
+  }
+  footer .wrap{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+  .foot-links{
+    display: flex;
+    gap: 20px;
+    list-style: none;
+    margin: 0; padding: 0;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 13px;
+  }
+  .foot-links a{ text-decoration: none; color: var(--muted); }
+  .foot-links a:hover{ color: var(--paper); }
+  .foot-loc{
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <span class="nav-mark">BORIS MILNER</span>
+    <ul class="nav-links">
+      <li><a href="#work">Work</a></li>
+      <li><a href="#archive">Archive</a></li>
+      <li><a href="https://github.com/borismilner">GitHub</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero wrap">
+  <h1>Software engineer, building tools that run quietly.</h1>
+  <p class="lede">
+    I write <strong>developer tools</strong> that sit in the background and stay
+    out of the way until they have something worth saying: a file finished, a
+    question needs an answer, a capture is ready. Based in Israel.
+  </p>
+
+  <div class="board" role="group" aria-label="Current projects">
+    <a class="status-row" href="#grabbit" style="--dot-color: var(--signal)">
+      <span class="dot" style="--dot-color: var(--signal)" aria-hidden="true"></span>
+      <span class="status-name">grabbit</span>
+      <span class="status-verb mono">parallel downloads, resumed on crash</span>
+      <span class="status-state mono" style="--dot-color: var(--signal)">active</span>
+    </a>
+    <a class="status-row" href="#qq" style="--dot-color: var(--live)">
+      <span class="dot" style="--dot-color: var(--live)" aria-hidden="true"></span>
+      <span class="status-name">qq</span>
+      <span class="status-verb mono">listening for a question worth asking</span>
+      <span class="status-state mono" style="--dot-color: var(--live)">active</span>
+    </a>
+    <a class="status-row" href="#snapper" style="--dot-color: var(--signal)">
+      <span class="dot" style="--dot-color: var(--signal)" aria-hidden="true"></span>
+      <span class="status-name">snapper</span>
+      <span class="status-verb mono">capture, annotate, never lose the edit</span>
+      <span class="status-state mono" style="--dot-color: var(--signal)">active</span>
+    </a>
+  </div>
+</header>
+
+<section id="work" class="wrap">
+  <div class="section-head">
+    <h2>Featured work</h2>
+    <span class="count mono">03</span>
+  </div>
+
+  <article class="feature" id="grabbit" style="--dot-color: var(--signal)">
+    <div class="feature-meta">
+      <span class="feature-eyebrow">Download manager</span>
+      <h3>grabbit</h3>
+      <p class="thesis">
+        Parallel, resumable downloads for Linux, with the tedious parts of free
+        hosters — wait timers, captchas, multi-part archives — handled for you.
+      </p>
+      <a class="feature-link" href="https://github.com/borismilner/grabbit">
+        View the repo <span class="arrow">&rarr;</span>
+      </a>
+    </div>
+    <div class="feature-copy">
+      <ul>
+        <li>Splits each file across several connections and resumes cleanly after a pause, crash, or reboot</li>
+        <li>Watches your clipboard and queues links the moment you copy them</li>
+        <li>Waits out hoster countdown timers and solves captchas in a real browser window, then carries that session into the download</li>
+        <li>Groups multi-part archives into one package with combined progress</li>
+        <li>One control API over MCP and HTTP/JSON-RPC drives everything the desktop app can do</li>
+      </ul>
+      <div class="badges">
+        <span class="badge">Go</span>
+        <span class="badge">Wails</span>
+        <span class="badge">Svelte</span>
+        <span class="badge">MCP</span>
+      </div>
+    </div>
+  </article>
+
+  <article class="feature flip" id="qq" style="--dot-color: var(--live)">
+    <div class="feature-meta">
+      <span class="feature-eyebrow">Agent interaction hub</span>
+      <h3>qq</h3>
+      <p class="thesis">
+        A desktop interaction hub for AI agents: when one needs a decision, a
+        credential, or just wants to say it's done, a card appears over
+        whatever you're doing, answered in one keystroke.
+      </p>
+      <a class="feature-link" href="https://github.com/borismilner/qq">
+        View the repo <span class="arrow">&rarr;</span>
+      </a>
+    </div>
+    <div class="feature-copy">
+      <ul>
+        <li>A short sound tells you what kind of thing arrived before you even look</li>
+        <li>Every option on a card has a number, so the whole exchange is one keystroke</li>
+        <li>Twenty tools over MCP, the same twenty as a CLI for shell scripts, hooks, and cron</li>
+        <li>Local only: no cloud, no account, nothing leaves the machine</li>
+      </ul>
+      <div class="badges">
+        <span class="badge">Go</span>
+        <span class="badge">MCP</span>
+        <span class="badge">Linux / X11</span>
+      </div>
+    </div>
+  </article>
+
+  <article class="feature" id="snapper" style="--dot-color: var(--signal)">
+    <div class="feature-meta">
+      <span class="feature-eyebrow">Capture &amp; annotation</span>
+      <h3>snapper</h3>
+      <p class="thesis">
+        A Linux-first screenshot tool with a fully non-destructive editor —
+        every annotation stays a reselectable object, saved as a re-editable
+        project instead of a flattened PNG.
+      </p>
+      <a class="feature-link" href="https://github.com/borismilner/snapper">
+        View the repo <span class="arrow">&rarr;</span>
+      </a>
+    </div>
+    <div class="feature-copy">
+      <ul>
+        <li>Freeze-frame capture overlay keeps the selection and magnifier pixel-perfect</li>
+        <li>Every annotation is undoable, restylable, and re-editable, saved as a <code class="mono">.snap</code> project</li>
+        <li>Annotation colors adapt automatically so they read on any background</li>
+        <li>Full capture history with OCR search over past screenshots</li>
+      </ul>
+      <div class="badges">
+        <span class="badge">Go</span>
+        <span class="badge">Gio</span>
+        <span class="badge">Linux</span>
+      </div>
+    </div>
+  </article>
+</section>
+
+<section id="archive" class="wrap">
+  <div class="section-head">
+    <h2>Archive</h2>
+    <span class="count mono">05</span>
+  </div>
+  <p class="thesis" style="color: var(--muted); max-width: var(--measure); margin-top: -16px;">
+    Earlier tools, mostly JVM and graph databases. Maintained on GitLab, not
+    currently active on GitHub.
+  </p>
+  <div class="archive-list">
+    <a class="archive-item" href="https://gitlab.com/fu-bar/from-github/q-runner">
+      <span class="archive-name">q-runner</span>
+      <span class="archive-desc">Expose Java business logic as REST endpoints</span>
+      <span class="archive-go mono">gitlab &rarr;</span>
+    </a>
+    <a class="archive-item" href="https://gitlab.com/fu-bar/from-github/giraffe">
+      <span class="archive-name">giraffe</span>
+      <span class="archive-desc">Graph entity ingestion tooling</span>
+      <span class="archive-go mono">gitlab &rarr;</span>
+    </a>
+    <a class="archive-item" href="https://gitlab.com/fu-bar/from-github/neogoodies">
+      <span class="archive-name">neogoodies</span>
+      <span class="archive-desc">Utilities for working with Neo4j</span>
+      <span class="archive-go mono">gitlab &rarr;</span>
+    </a>
+    <a class="archive-item" href="https://gitlab.com/fu-bar/from-github/neo_embedded">
+      <span class="archive-name">neo_embedded</span>
+      <span class="archive-desc">Embedded Neo4j instances for unit testing</span>
+      <span class="archive-go mono">gitlab &rarr;</span>
+    </a>
+    <a class="archive-item" href="https://gitlab.com/fu-bar/from-github/spark_datasource">
+      <span class="archive-name">spark_datasource</span>
+      <span class="archive-desc">A minimal Spark datasource implementation</span>
+      <span class="archive-go mono">gitlab &rarr;</span>
+    </a>
+  </div>
+  <p class="archive-note">Full history on <a href="https://gitlab.com/fu-bar/from-github">gitlab.com/fu-bar/from-github</a>.</p>
+</section>
+
+<footer>
+  <div class="wrap">
+    <ul class="foot-links">
+      <li><a href="https://github.com/borismilner">GitHub</a></li>
+      <li><a href="https://gitlab.com/borismilner">GitLab</a></li>
+      <li><a href="mailto:boris.milner@gmail.com">Email</a></li>
+    </ul>
+    <span class="foot-loc mono">Israel</span>
+  </div>
+</footer>
+
+</body>
+</html>
