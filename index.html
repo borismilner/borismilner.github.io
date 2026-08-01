@@ -2,558 +2,722 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Boris Milner — Software Engineer</title>
+<title>Boris Milner</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Boris Milner builds developer tools that run quietly in the background and speak up exactly when it matters: grabbit, qq, and snapper.">
-<meta name="theme-color" content="#14171c">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta name="description" content="Boris Milner builds tools for the Linux desktop: grabbit (downloads), qq (a way for AI agents to reach you), snapper (screenshots that never flatten).">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fdfdfb">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#222429">
+<meta property="og:title" content="Boris Milner">
+<meta property="og:description" content="Tools for the Linux desktop: grabbit, qq, snapper. Software should cost you seconds, not context switches.">
+<meta property="og:url" content="https://borismilner.github.io">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/821440?v=4">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2326282c%22%2F%3E%3Ctext%20x%3D%2232%22%20y%3D%2243%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2230%22%20fill%3D%22%23fdfdfb%22%20text-anchor%3D%22middle%22%3Ebm%3C%2Ftext%3E%3C%2Fsvg%3E">
 <style>
   :root{
-    --ink: #14171c;
-    --panel: #1b2027;
-    --panel-raised: #202631;
-    --hairline: #2a313c;
-    --paper: #edeae2;
-    --muted: #8b93a0;
-    --signal: #e8a33d;
-    --live: #4fa6a0;
-    --radius: 3px;
-    --measure: 720px;
+    color-scheme: light dark;
+    --paper: #fdfdfb;
+    --ink: #26282c;
+    --muted: #6c7077;
+    --line: #e5e3dd;
+    --card: #ffffff;
+    --card-line: #d8d6cf;
+    --grabbit: #c78d2b;
+    --qq: #5b6ee0;
+    --qq-soft: #e9ecfb;
+    --snapper: #35916b;
+    --snapper-soft: #dcefe6;
+    --serif: Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper: #222429;
+      --ink: #e6e4df;
+      --muted: #9da1a8;
+      --line: #383b41;
+      --card: #2a2d33;
+      --card-line: #45484f;
+      --grabbit: #d9a441;
+      --qq: #8b9af0;
+      --qq-soft: #323a58;
+      --snapper: #57b98d;
+      --snapper-soft: #263e33;
+    }
   }
 
   *, *::before, *::after{ box-sizing: border-box; }
-  html{ scroll-behavior: smooth; }
+
+  html{
+    scroll-behavior: smooth;
+    scrollbar-color: var(--card-line) transparent;
+  }
   @media (prefers-reduced-motion: reduce){
     html{ scroll-behavior: auto; }
   }
 
   body{
     margin: 0;
-    background: var(--ink);
-    color: var(--paper);
-    font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    font-size: 16px;
-    line-height: 1.55;
-    -webkit-font-smoothing: antialiased;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+
+    & ::selection{ background: var(--qq-soft); }
   }
 
-  a{ color: inherit; }
-  a:focus-visible, button:focus-visible{
-    outline: 2px solid var(--signal);
-    outline-offset: 3px;
+  .col{
+    max-width: 41em;
+    margin-inline: auto;
+    padding-inline: 24px;
   }
 
-  .mono{ font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+  a{
+    color: inherit;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
 
-  .wrap{
-    max-width: 1040px;
-    margin: 0 auto;
-    padding: 0 32px;
-  }
-
-  @media (max-width: 640px){
-    .wrap{ padding: 0 20px; }
+    &:hover{ text-decoration-thickness: 2px; }
+    &:focus-visible{ outline: 2px solid var(--qq); outline-offset: 2px; border-radius: 2px; }
   }
 
-  /* ---------- top nav ---------- */
-  .nav{
-    padding: 28px 0;
-  }
-  .nav .wrap{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .nav-mark{
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 14px;
-    letter-spacing: 0.04em;
-    color: var(--muted);
-  }
-  .nav-links{
-    display: flex;
-    gap: 24px;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 13px;
-  }
-  .nav-links a{
-    text-decoration: none;
-    color: var(--muted);
-    border-bottom: 1px solid transparent;
-    transition: color 0.15s ease, border-color 0.15s ease;
-  }
-  .nav-links a:hover{
-    color: var(--paper);
-    border-color: var(--hairline);
-  }
+  .mono{ font-family: var(--mono); font-size: 0.9em; }
 
-  /* ---------- hero ---------- */
-  .hero{
-    padding: 64px 0 88px;
-  }
-  .hero h1{
-    font-size: clamp(2.4rem, 5vw, 3.4rem);
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    margin: 0 0 20px;
-    max-width: 14ch;
-  }
-  .hero p.lede{
-    max-width: var(--measure);
-    font-size: 1.15rem;
-    color: var(--muted);
-    margin: 0 0 44px;
-  }
-  .hero p.lede strong{
-    color: var(--paper);
-    font-weight: 500;
-  }
+  /* masthead */
+  .masthead{
+    padding-top: 76px;
 
-  .hero, .status-row{
-    opacity: 0;
-    transform: translateY(14px);
-    animation: rise 0.6s ease forwards;
-  }
-  .hero{ animation-delay: 0s; }
-  @keyframes rise{
-    to{ opacity: 1; transform: translateY(0); }
-  }
-  @media (prefers-reduced-motion: reduce){
-    .hero, .status-row{
-      opacity: 1; transform: none; animation: none;
+    & h1{
+      font-size: 2.1rem;
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: 0.01em;
+      margin: 0;
+      text-wrap: balance;
+    }
+    & .sub{
+      font-family: var(--mono);
+      font-size: 0.8125rem;
+      color: var(--muted);
+      margin: 8px 0 0;
     }
   }
 
-  /* ---------- status board (signature element) ---------- */
-  .board{
-    border: 1px solid var(--hairline);
-    border-radius: var(--radius);
-    background: var(--panel);
+  .lede{
+    margin: 28px 0 0;
+    font-size: 1.125rem;
+    text-wrap: pretty;
+  }
+
+  /* the qq card: hero and navigation in one */
+  .card-seat{
+    margin-top: 44px;
+    container-type: inline-size;
+  }
+  .qq-card{
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 10px;
+    box-shadow: 0 1px 2px rgba(18,18,22,0.05), 0 10px 28px rgba(18,18,22,0.09);
+    max-width: 27em;
     overflow: hidden;
-  }
-  .status-row{
-    display: grid;
-    grid-template-columns: 20px 1fr auto auto;
-    align-items: center;
-    gap: 16px;
-    padding: 16px 20px;
-    text-decoration: none;
-    color: var(--paper);
-    border-bottom: 1px solid var(--hairline);
-    transition: background 0.15s ease;
-  }
-  .status-row:last-child{ border-bottom: none; }
-  .status-row:hover{ background: var(--panel-raised); }
-  .status-row:nth-child(1){ animation-delay: 0.15s; }
-  .status-row:nth-child(2){ animation-delay: 0.25s; }
-  .status-row:nth-child(3){ animation-delay: 0.35s; }
 
-  .dot{
-    width: 9px; height: 9px; border-radius: 50%;
-    background: var(--dot-color, var(--live));
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--dot-color, var(--live)) 22%, transparent);
-    animation: breathe 2.6s ease-in-out infinite;
-  }
-  @media (prefers-reduced-motion: reduce){
-    .dot{ animation: none; }
-  }
-  @keyframes breathe{
-    0%, 100%{ opacity: 1; }
-    50%{ opacity: 0.45; }
-  }
+    & .bar{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--muted);
 
-  .status-name{ font-weight: 600; }
-  .status-verb{
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 13px;
-    color: var(--muted);
-  }
-  .status-state{
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 12px;
-    letter-spacing: 0.06em;
-    color: var(--dot-color, var(--live));
-    text-transform: uppercase;
-  }
+      & .app-dot{
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: var(--qq);
+      }
+    }
+    & .title{
+      padding: 14px 18px 4px;
+      margin: 0;
+      font-weight: 700;
+    }
+    & ol{
+      list-style: none;
+      margin: 0;
+      padding: 8px 8px 10px;
+    }
+    & li + li{ margin-top: 2px; }
 
-  @media (max-width: 560px){
-    .status-row{ grid-template-columns: 16px 1fr; row-gap: 4px; }
-    .status-verb, .status-state{ grid-column: 2; }
+    /* spotlight: hovering one option quiets the others */
+    & ol:has(.opt:hover) .opt:not(:hover){ opacity: 0.55; }
   }
-
-  /* ---------- section scaffolding ---------- */
-  section{ padding: 88px 0; }
-  .section-head{
+  .opt{
     display: flex;
     align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 40px;
-    border-bottom: 1px solid var(--hairline);
-    padding-bottom: 16px;
+    gap: 12px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: opacity 0.15s ease;
+
+    &:hover, &.pressed{ background: var(--qq-soft); }
+
+    & .key{
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--qq);
+      border: 1px solid var(--card-line);
+      border-bottom-width: 2px;
+      border-radius: 4px;
+      padding: 1px 7px;
+    }
+    &.pressed .key{ background: var(--qq); border-color: var(--qq); color: var(--card); }
+
+    & .what{ color: var(--muted); font-size: 0.9375rem; }
   }
-  .section-head h2{
-    font-size: 1.05rem;
-    font-weight: 600;
-    margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+  @container (max-width: 24em){
+    .opt .what{ display: none; }
   }
-  .section-head .count{
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 13px;
+  .card-note{
+    margin: 14px 0 0;
+    font-size: 0.875rem;
     color: var(--muted);
+
+    & .kbd-hint{ font-family: var(--mono); font-size: 0.8125rem; }
+  }
+  @media (max-width: 640px), (pointer: coarse){
+    .card-note .kbd-hint{ display: none; }
   }
 
-  /* ---------- features ---------- */
-  .feature{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 48px;
-    padding: 40px 0;
-    border-bottom: 1px solid var(--hairline);
-  }
-  .feature:last-child{ border-bottom: none; }
-  .feature.flip .feature-copy{ order: 2; }
-  .feature.flip .feature-meta{ order: 1; }
-
-  @media (max-width: 760px){
-    .feature{ grid-template-columns: 1fr; gap: 20px; }
-    .feature.flip .feature-copy, .feature .feature-copy{ order: 2; }
-    .feature.flip .feature-meta, .feature .feature-meta{ order: 1; }
-  }
-
-  .feature-meta{
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding-top: 4px;
-  }
-  .feature-eyebrow{
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    color: var(--dot-color, var(--live));
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-  .feature-meta h3{
-    font-size: 1.7rem;
-    margin: 0 0 12px;
+  /* sections */
+  section{ padding-top: 68px; }
+  h2{
+    font-size: 1.4rem;
     font-weight: 700;
+    line-height: 1.2;
+    margin: 0 0 4px;
+
+    &:focus{ outline: none; }
   }
-  .feature-meta .thesis{
+  .role{
+    font-family: var(--mono);
+    font-size: 0.75rem;
     color: var(--muted);
-    margin: 0 0 20px;
+    margin: 0 0 18px;
   }
-  .feature-link{
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 13px;
-    text-decoration: none;
-    color: var(--paper);
-    border-bottom: 1px solid var(--dot-color, var(--live));
-    width: fit-content;
-    padding-bottom: 2px;
+  section p{ margin: 0 0 18px; text-wrap: pretty; }
+  .meta{
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    color: var(--muted);
   }
-  .feature-link .arrow{ transition: transform 0.15s ease; }
-  .feature-link:hover .arrow{ transform: translateX(3px); }
 
-  .feature-copy{
-    background: var(--panel);
-    border: 1px solid var(--hairline);
-    border-radius: var(--radius);
-    padding: 28px;
-  }
-  .feature-copy ul{
-    margin: 0 0 20px;
-    padding-left: 20px;
-    color: var(--paper);
-  }
-  .feature-copy li{ margin-bottom: 10px; }
-  .feature-copy li:last-child{ margin-bottom: 0; }
-  .feature-copy li::marker{ color: var(--dot-color, var(--live)); }
+  figure{
+    margin: 26px 0;
+    container-type: inline-size;
 
-  .badges{
+    & figcaption{
+      margin-top: 10px;
+      font-size: 0.875rem;
+      color: var(--muted);
+      text-wrap: pretty;
+    }
+  }
+
+  /* grabbit: download queue */
+  .queue{
+    border: 1px solid var(--card-line);
+    border-radius: 10px;
+    background: var(--card);
+    padding: 4px 0;
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
+
+    & .dl{
+      padding: 12px 16px;
+
+      & + .dl{ border-top: 1px solid var(--line); }
+    }
+    & .top{
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+
+      & .spd{ color: var(--grabbit); white-space: nowrap; }
+      & .wait{ color: var(--muted); white-space: nowrap; }
+    }
+    & .name{
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    & .sub{
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+  }
+  @container (max-width: 26em){
+    .queue .top{ flex-direction: column; gap: 2px; }
+  }
+  .conns{
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid var(--hairline);
+    gap: 3px;
+    height: 6px;
+
+    & span{
+      flex: 1;
+      background: var(--line);
+      border-radius: 3px;
+      position: relative;
+      overflow: hidden;
+
+      &::after{
+        content: "";
+        position: absolute;
+        inset: 0;
+        width: var(--fill, 0%);
+        background: var(--grabbit);
+        border-radius: 3px;
+      }
+    }
+    &.idle span::after{ background: var(--card-line); }
   }
-  .badge{
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 11px;
-    letter-spacing: 0.02em;
-    color: var(--muted);
-    border: 1px solid var(--hairline);
+  @keyframes fill-up{
+    from{ width: 0%; }
+    to{ width: var(--fill, 0%); }
+  }
+  /* the bars fill as they scroll into view: progress you can feel */
+  @supports (animation-timeline: view()){
+    @media (prefers-reduced-motion: no-preference){
+      .conns:not(.idle) span::after{
+        animation: fill-up linear both;
+        animation-timeline: view();
+        animation-range: entry 40% entry 130%;
+      }
+    }
+  }
+
+  /* qq: shell snippet */
+  pre{
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 10px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    margin: 0;
+
+    & .cm{ color: var(--muted); }
+    & .kw{ color: var(--qq); }
+    & .str{ color: var(--snapper); }
+  }
+
+  /* snapper: annotated capture */
+  .capture{
+    position: relative;
+    border: 1px solid var(--card-line);
+    border-radius: 10px;
+    background: var(--card);
+    padding: 36px 20px 52px;
+    overflow: hidden;
+  }
+  .fake-win{
+    border: 1px solid var(--card-line);
+    border-radius: 8px;
+    max-width: 22em;
+    margin: 0 auto;
+    background: var(--paper);
+
+    & .win-bar{
+      padding: 7px 12px;
+      border-bottom: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      color: var(--muted);
+    }
+    & .win-body{ padding: 14px 16px 18px; }
+    & .fake-line{
+      height: 9px;
+      border-radius: 4px;
+      background: var(--line);
+      margin-bottom: 9px;
+
+      &.short{ width: 62%; }
+      &.mid{ width: 80%; }
+    }
+    & .fake-check{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      color: var(--muted);
+
+      & .box{
+        width: 12px; height: 12px;
+        border: 1.5px solid var(--muted);
+        border-radius: 3px;
+        background: var(--snapper-soft);
+      }
+    }
+  }
+  .sel{
+    position: absolute;
+    border: 1.5px dashed var(--snapper);
+    border-radius: 2px;
+
+    & .h{
+      position: absolute;
+      width: 7px; height: 7px;
+      background: var(--card);
+      border: 1.5px solid var(--snapper);
+      border-radius: 1px;
+
+      &.tl{ top: -4px; left: -4px; }
+      &.tr{ top: -4px; right: -4px; }
+      &.bl{ bottom: -4px; left: -4px; }
+      &.br{ bottom: -4px; right: -4px; }
+    }
+  }
+  .anno-arrow{
+    position: absolute;
+    overflow: visible;
+
+    & .shaft{
+      stroke-dasharray: 1;
+      stroke-dashoffset: 0;
+    }
+  }
+  .anno-pill{
+    position: absolute;
+    left: 7%;
+    bottom: 66px;
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    color: var(--ink);
+    background: var(--snapper-soft);
+    border: 1px solid var(--snapper);
     border-radius: 100px;
-    padding: 4px 10px;
-  }
-
-  /* ---------- archive ---------- */
-  .archive-list{
-    border-top: 1px solid var(--hairline);
-  }
-  .archive-item{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    padding: 18px 0;
-    border-bottom: 1px solid var(--hairline);
-    text-decoration: none;
-    color: var(--paper);
-  }
-  .archive-name{ font-weight: 600; }
-  .archive-desc{
-    color: var(--muted);
-    font-size: 0.9rem;
-    flex: 1;
-    padding: 0 16px;
-  }
-  .archive-go{
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 12px;
-    color: var(--muted);
+    padding: 3px 10px;
     white-space: nowrap;
-    transition: color 0.15s ease;
   }
-  .archive-item:hover .archive-go{ color: var(--live); }
+  /* on narrow screens the pill would cover the very label the arrow points at */
+  @container (max-width: 30em){
+    .anno-pill{ left: auto; right: 12px; bottom: 8px; }
+  }
+  @keyframes draw{
+    from{ stroke-dashoffset: 1; }
+    to{ stroke-dashoffset: 0; }
+  }
+  @keyframes appear{
+    from{ opacity: 0; }
+    to{ opacity: 1; }
+  }
+  /* the arrow draws itself as the figure scrolls in, like a live annotation */
+  @supports (animation-timeline: view()){
+    @media (prefers-reduced-motion: no-preference){
+      .anno-arrow .shaft{
+        animation: draw linear both;
+        animation-timeline: view();
+        animation-range: entry 50% entry 140%;
+      }
+      .anno-arrow .head, .anno-pill, .sel{
+        animation: appear linear both;
+        animation-timeline: view();
+        animation-range: entry 110% entry 150%;
+      }
+    }
+  }
 
-  @media (max-width: 640px){
-    .archive-item{ flex-wrap: wrap; }
-    .archive-desc{ flex-basis: 100%; padding: 4px 0 0; order: 3; }
-  }
-
-  .archive-note{
-    margin: 20px 0 0;
-    font-size: 0.85rem;
-    color: var(--muted);
-  }
-  .archive-note a{ color: var(--muted); text-decoration: underline; text-underline-offset: 2px; }
-  .archive-note a:hover{ color: var(--paper); }
-
-  /* ---------- footer ---------- */
-  footer{
-    padding: 56px 0 72px;
-    border-top: 1px solid var(--hairline);
-  }
-  footer .wrap{
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    flex-wrap: wrap;
-    gap: 24px;
-  }
-  .foot-links{
-    display: flex;
-    gap: 20px;
+  /* archive */
+  .archive{
     list-style: none;
-    margin: 0; padding: 0;
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 13px;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--line);
+
+    & li{
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    & .desc{
+      color: var(--muted);
+      font-size: 0.9375rem;
+      text-align: right;
+    }
   }
-  .foot-links a{ text-decoration: none; color: var(--muted); }
-  .foot-links a:hover{ color: var(--paper); }
-  .foot-loc{
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 12px;
+  @media (max-width: 560px){
+    .archive li{ flex-direction: column; gap: 2px; }
+    .archive .desc{ text-align: left; }
+  }
+
+  /* footer */
+  footer{
+    margin-top: 76px;
+    padding-top: 28px;
+    padding-bottom: 56px;
+    border-top: 1px solid var(--line);
+
+    & .links{
+      font-family: var(--mono);
+      font-size: 0.8125rem;
+      margin: 0;
+
+      & a{ color: var(--muted);
+        &:hover{ color: var(--ink); }
+      }
+      & span{ color: var(--card-line); margin: 0 6px; }
+    }
+  }
+  .colophon{
+    margin: 14px 0 0;
+    font-size: 0.8125rem;
     color: var(--muted);
+
+    & a{ color: var(--muted); }
   }
 </style>
 </head>
 <body>
 
-<nav class="nav">
-  <div class="wrap">
-    <span class="nav-mark">BORIS MILNER</span>
-    <ul class="nav-links">
-      <li><a href="#work">Work</a></li>
-      <li><a href="#archive">Archive</a></li>
-      <li><a href="https://github.com/borismilner">GitHub</a></li>
-    </ul>
-  </div>
-</nav>
-
-<header class="hero wrap">
-  <h1>Software engineer, building tools that run quietly.</h1>
+<header class="masthead col">
+  <h1>Boris Milner</h1>
+  <p class="sub">software engineer &middot; Israel</p>
   <p class="lede">
-    I write <strong>developer tools</strong> that sit in the background and stay
-    out of the way until they have something worth saying: a file finished, a
-    question needs an answer, a capture is ready. Based in Israel.
+    Hi, I'm Boris. I build tools for the Linux desktop, and they all come
+    from the same itch: I hate being interrupted for nothing, and I hate
+    finding out too late that something needed me. So I write software that
+    handles what it can on its own, and when it really needs a human, costs
+    you two seconds instead of a context switch.
   </p>
-
-  <div class="board" role="group" aria-label="Current projects">
-    <a class="status-row" href="#grabbit" style="--dot-color: var(--signal)">
-      <span class="dot" style="--dot-color: var(--signal)" aria-hidden="true"></span>
-      <span class="status-name">grabbit</span>
-      <span class="status-verb mono">parallel downloads, resumed on crash</span>
-      <span class="status-state mono" style="--dot-color: var(--signal)">active</span>
-    </a>
-    <a class="status-row" href="#qq" style="--dot-color: var(--live)">
-      <span class="dot" style="--dot-color: var(--live)" aria-hidden="true"></span>
-      <span class="status-name">qq</span>
-      <span class="status-verb mono">listening for a question worth asking</span>
-      <span class="status-state mono" style="--dot-color: var(--live)">active</span>
-    </a>
-    <a class="status-row" href="#snapper" style="--dot-color: var(--signal)">
-      <span class="dot" style="--dot-color: var(--signal)" aria-hidden="true"></span>
-      <span class="status-name">snapper</span>
-      <span class="status-verb mono">capture, annotate, never lose the edit</span>
-      <span class="status-state mono" style="--dot-color: var(--signal)">active</span>
-    </a>
-  </div>
 </header>
 
-<section id="work" class="wrap">
-  <div class="section-head">
-    <h2>Featured work</h2>
-    <span class="count mono">03</span>
-  </div>
+<div class="card-seat col">
+  <nav class="qq-card" aria-label="Projects">
+    <div class="bar"><span class="app-dot" aria-hidden="true"></span>qq</div>
+    <p class="title">Where do you want to start?</p>
+    <ol>
+      <li><a class="opt" href="#grabbit" data-key="1">
+        <span class="key">1</span><span>grabbit</span><span class="what">the download manager</span>
+      </a></li>
+      <li><a class="opt" href="#qq" data-key="2">
+        <span class="key">2</span><span>qq</span><span class="what">this card, actually</span>
+      </a></li>
+      <li><a class="opt" href="#snapper" data-key="3">
+        <span class="key">3</span><span>snapper</span><span class="what">the screenshot editor</span>
+      </a></li>
+    </ol>
+  </nav>
+  <p class="card-note">That is a real qq card, the tool in section two.
+    <span class="kbd-hint">The numbers work here too: press 1, 2 or 3.</span></p>
+</div>
 
-  <article class="feature" id="grabbit" style="--dot-color: var(--signal)">
-    <div class="feature-meta">
-      <span class="feature-eyebrow">Download manager</span>
-      <h3>grabbit</h3>
-      <p class="thesis">
-        Parallel, resumable downloads for Linux, with the tedious parts of free
-        hosters — wait timers, captchas, multi-part archives — handled for you.
-      </p>
-      <a class="feature-link" href="https://github.com/borismilner/grabbit">
-        View the repo <span class="arrow">&rarr;</span>
-      </a>
-    </div>
-    <div class="feature-copy">
-      <ul>
-        <li>Splits each file across several connections and resumes cleanly after a pause, crash, or reboot</li>
-        <li>Watches your clipboard and queues links the moment you copy them</li>
-        <li>Waits out hoster countdown timers and solves captchas in a real browser window, then carries that session into the download</li>
-        <li>Groups multi-part archives into one package with combined progress</li>
-        <li>One control API over MCP and HTTP/JSON-RPC drives everything the desktop app can do</li>
-      </ul>
-      <div class="badges">
-        <span class="badge">Go</span>
-        <span class="badge">Wails</span>
-        <span class="badge">Svelte</span>
-        <span class="badge">MCP</span>
+<main>
+  <section id="grabbit" class="col">
+    <h2 tabindex="-1">grabbit</h2>
+    <p class="role">download manager &middot; Go, Wails, Svelte</p>
+    <p>
+      A download manager for Linux, built because I loved what JDownloader
+      did and wanted it lean, native and scriptable. Copy a link and grabbit
+      takes it from there: several connections per file, clean resume after
+      a crash or a reboot, multi-part archives grouped into one package.
+    </p>
+    <p>
+      My favorite part is the free-hoster machinery. A countdown timer? It
+      waits it out in the background. A captcha? It opens a real browser
+      window, lets you solve it, then carries the whole solved session
+      (cookies, TLS fingerprint and all) into the download. You do the two
+      seconds only a human can do; it does the rest.
+    </p>
+    <figure>
+      <div class="queue" role="img" aria-label="Mock of the grabbit queue: one package downloading over six connections, one download waiting out a hoster timer">
+        <div class="dl">
+          <div class="top">
+            <span class="name">fedora-workstation.part01.rar &nbsp;+2</span>
+            <span class="spd">14.2 MB/s</span>
+          </div>
+          <div class="conns" aria-hidden="true">
+            <span style="--fill:100%"></span><span style="--fill:100%"></span><span style="--fill:84%"></span><span style="--fill:71%"></span><span style="--fill:52%"></span><span style="--fill:38%"></span>
+          </div>
+          <div class="sub">package &middot; 3 files &middot; 4.7 GB &middot; 6 connections</div>
+        </div>
+        <div class="dl">
+          <div class="top">
+            <span class="name">slow-hoster.net/dataset-2024.zip</span>
+            <span class="wait">timer &middot; 0:42</span>
+          </div>
+          <div class="conns idle" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <div class="sub">waiting out the hoster countdown, no babysitting</div>
+        </div>
       </div>
-    </div>
-  </article>
+      <figcaption>Per-connection progress, and a countdown nobody has to watch.
+      If your browser supports scroll-driven animations, those bars just filled
+      as you scrolled.</figcaption>
+    </figure>
+    <p>
+      New sites are small YAML or JavaScript profiles dropped in a folder, no
+      rebuild. And everything the desktop app can do, a script or an AI agent
+      can do too, through one control API over MCP and HTTP/JSON-RPC.
+    </p>
+    <p class="meta"><a href="https://github.com/borismilner/grabbit">github.com/borismilner/grabbit</a></p>
+  </section>
 
-  <article class="feature flip" id="qq" style="--dot-color: var(--live)">
-    <div class="feature-meta">
-      <span class="feature-eyebrow">Agent interaction hub</span>
-      <h3>qq</h3>
-      <p class="thesis">
-        A desktop interaction hub for AI agents: when one needs a decision, a
-        credential, or just wants to say it's done, a card appears over
-        whatever you're doing, answered in one keystroke.
-      </p>
-      <a class="feature-link" href="https://github.com/borismilner/qq">
-        View the repo <span class="arrow">&rarr;</span>
-      </a>
-    </div>
-    <div class="feature-copy">
-      <ul>
-        <li>A short sound tells you what kind of thing arrived before you even look</li>
-        <li>Every option on a card has a number, so the whole exchange is one keystroke</li>
-        <li>Twenty tools over MCP, the same twenty as a CLI for shell scripts, hooks, and cron</li>
-        <li>Local only: no cloud, no account, nothing leaves the machine</li>
-      </ul>
-      <div class="badges">
-        <span class="badge">Go</span>
-        <span class="badge">MCP</span>
-        <span class="badge">Linux / X11</span>
+  <section id="qq" class="col">
+    <h2 tabindex="-1">qq</h2>
+    <p class="role">desktop interaction hub for AI agents &middot; Go, Linux/X11</p>
+    <p>
+      An agent works for twenty minutes while you are somewhere else. The
+      moment it needs one word from you, it either waits in a terminal nobody
+      is watching, or it guesses, and you find out later in the diff. qq is
+      the third option.
+    </p>
+    <p>
+      When an agent needs a decision, a credential or an approval, a card
+      appears over whatever you are doing. A short sound tells you what kind
+      of thing arrived before you even look. Every option has a number, the
+      whole exchange is one keystroke, and the answer lands back in the code
+      that was blocked on it. Mis-clicked? Answers hold for three seconds
+      behind an undo strip.
+    </p>
+    <figure>
+      <pre><code><span class="kw">if</span> qq confirm --title <span class="str">"Push to main?"</span> --body <span class="str">"12 commits, tests green"</span>; <span class="kw">then</span>
+    git push
+<span class="kw">fi</span>
+
+qq notify --level success --title <span class="str">"release is live"</span> \
+          --speak <span class="str">"the release is out"</span>   <span class="cm"># non-blocking, spoken aloud</span></code></pre>
+      <figcaption>Every tool is also a CLI. Blocking calls map the answer to an exit
+      code, so a shell script can branch on a human without parsing anything.</figcaption>
+    </figure>
+    <p>
+      There are twenty tools: questions, forms, diff reviews with approve and
+      request-changes, progress bars, spoken lines, masked secret entry. All
+      of them over MCP and the same twenty from the shell. And all of it
+      local: no cloud, no account, nothing leaves the machine.
+    </p>
+    <p class="meta"><a href="https://github.com/borismilner/qq">github.com/borismilner/qq</a></p>
+  </section>
+
+  <section id="snapper" class="col">
+    <h2 tabindex="-1">snapper</h2>
+    <p class="role">screenshot capture and annotation &middot; Go, Gio</p>
+    <p>
+      snapper takes Flameshot's in-overlay speed and Snagit's magnifier
+      precision as starting points, then adds the editor I always wanted:
+      one where nothing ever flattens. Every arrow, label and redaction
+      stays a separate object you can reselect, restyle or move next week.
+      A scene saves as a <span class="mono">.snap</span> project, not a
+      baked PNG.
+    </p>
+    <figure>
+      <div class="capture" role="img" aria-label="Mock of the snapper editor: a captured settings window with a selected arrow annotation and a label pill">
+        <div class="fake-win" aria-hidden="true">
+          <div class="win-bar">settings.png</div>
+          <div class="win-body">
+            <div class="fake-line mid"></div>
+            <div class="fake-line short"></div>
+            <div class="fake-line"></div>
+            <div class="fake-check"><span class="box"></span>enable telemetry</div>
+          </div>
+        </div>
+        <svg class="anno-arrow" aria-hidden="true" style="left:9%; bottom:18px; width:170px; height:74px;" viewBox="0 0 170 74">
+          <path class="shaft" pathLength="1" d="M6 68 C 50 62, 96 52, 128 30" fill="none" stroke="var(--snapper)" stroke-width="3" stroke-linecap="round"/>
+          <path class="head" d="M140 20 L119 27 L130 41 Z" fill="var(--snapper)"/>
+        </svg>
+        <span class="anno-pill" aria-hidden="true">on by default?</span>
+        <span class="sel" aria-hidden="true" style="left:6%; bottom:16px; width:190px; height:80px;">
+          <span class="h tl"></span><span class="h tr"></span><span class="h bl"></span><span class="h br"></span>
+        </span>
       </div>
-    </div>
-  </article>
+      <figcaption>Annotations stay objects: that arrow drew itself on the way in,
+      and the handles mean you can still grab it.</figcaption>
+    </figure>
+    <p>
+      The small decisions are where it earns its keep. Annotations pick white
+      or black by themselves so they read on any background. Closing the
+      editor never loses work; unsaved changes drop a recovery file. And
+      capture history is searchable by the text inside your screenshots,
+      through OCR.
+    </p>
+    <p class="meta"><a href="https://github.com/borismilner/snapper">github.com/borismilner/snapper</a></p>
+  </section>
 
-  <article class="feature" id="snapper" style="--dot-color: var(--signal)">
-    <div class="feature-meta">
-      <span class="feature-eyebrow">Capture &amp; annotation</span>
-      <h3>snapper</h3>
-      <p class="thesis">
-        A Linux-first screenshot tool with a fully non-destructive editor —
-        every annotation stays a reselectable object, saved as a re-editable
-        project instead of a flattened PNG.
-      </p>
-      <a class="feature-link" href="https://github.com/borismilner/snapper">
-        View the repo <span class="arrow">&rarr;</span>
-      </a>
-    </div>
-    <div class="feature-copy">
-      <ul>
-        <li>Freeze-frame capture overlay keeps the selection and magnifier pixel-perfect</li>
-        <li>Every annotation is undoable, restylable, and re-editable, saved as a <code class="mono">.snap</code> project</li>
-        <li>Annotation colors adapt automatically so they read on any background</li>
-        <li>Full capture history with OCR search over past screenshots</li>
-      </ul>
-      <div class="badges">
-        <span class="badge">Go</span>
-        <span class="badge">Gio</span>
-        <span class="badge">Linux</span>
-      </div>
-    </div>
-  </article>
-</section>
+  <section id="archive" class="col">
+    <h2 tabindex="-1">Earlier work</h2>
+    <p class="role">JVM, graph databases, Spark</p>
+    <p>
+      An earlier era, mostly Java and Neo4j. Archived on
+      <a href="https://gitlab.com/fu-bar/from-github">GitLab</a> and no
+      longer active, but the code is all there.
+    </p>
+    <ul class="archive">
+      <li><a href="https://gitlab.com/fu-bar/from-github/q-runner">q-runner</a>
+        <span class="desc">expose Java business logic as REST endpoints</span></li>
+      <li><a href="https://gitlab.com/fu-bar/from-github/giraffe">giraffe</a>
+        <span class="desc">graph entity ingestion tooling</span></li>
+      <li><a href="https://gitlab.com/fu-bar/from-github/neogoodies">neogoodies</a>
+        <span class="desc">utilities for working with Neo4j</span></li>
+      <li><a href="https://gitlab.com/fu-bar/from-github/neo_embedded">neo_embedded</a>
+        <span class="desc">embedded Neo4j instances for unit tests</span></li>
+      <li><a href="https://gitlab.com/fu-bar/from-github/spark_datasource">spark_datasource</a>
+        <span class="desc">a minimal Spark datasource</span></li>
+    </ul>
+  </section>
 
-<section id="archive" class="wrap">
-  <div class="section-head">
-    <h2>Archive</h2>
-    <span class="count mono">05</span>
-  </div>
-  <p class="thesis" style="color: var(--muted); max-width: var(--measure); margin-top: -16px;">
-    Earlier tools, mostly JVM and graph databases. Maintained on GitLab, not
-    currently active on GitHub.
-  </p>
-  <div class="archive-list">
-    <a class="archive-item" href="https://gitlab.com/fu-bar/from-github/q-runner">
-      <span class="archive-name">q-runner</span>
-      <span class="archive-desc">Expose Java business logic as REST endpoints</span>
-      <span class="archive-go mono">gitlab &rarr;</span>
-    </a>
-    <a class="archive-item" href="https://gitlab.com/fu-bar/from-github/giraffe">
-      <span class="archive-name">giraffe</span>
-      <span class="archive-desc">Graph entity ingestion tooling</span>
-      <span class="archive-go mono">gitlab &rarr;</span>
-    </a>
-    <a class="archive-item" href="https://gitlab.com/fu-bar/from-github/neogoodies">
-      <span class="archive-name">neogoodies</span>
-      <span class="archive-desc">Utilities for working with Neo4j</span>
-      <span class="archive-go mono">gitlab &rarr;</span>
-    </a>
-    <a class="archive-item" href="https://gitlab.com/fu-bar/from-github/neo_embedded">
-      <span class="archive-name">neo_embedded</span>
-      <span class="archive-desc">Embedded Neo4j instances for unit testing</span>
-      <span class="archive-go mono">gitlab &rarr;</span>
-    </a>
-    <a class="archive-item" href="https://gitlab.com/fu-bar/from-github/spark_datasource">
-      <span class="archive-name">spark_datasource</span>
-      <span class="archive-desc">A minimal Spark datasource implementation</span>
-      <span class="archive-go mono">gitlab &rarr;</span>
-    </a>
-  </div>
-  <p class="archive-note">Full history on <a href="https://gitlab.com/fu-bar/from-github">gitlab.com/fu-bar/from-github</a>.</p>
-</section>
+  <section id="hello" class="col">
+    <h2 tabindex="-1">Say hello</h2>
+    <p>
+      All three tools are open source, and the READMEs are the real
+      documentation. If one would be useful to you, take it. If you want to
+      change it, issues and patches are welcome. And if you are hiring
+      people who sweat this kind of detail, my inbox is open:
+      <a href="mailto:boris.milner@gmail.com">boris.milner@gmail.com</a>.
+    </p>
+  </section>
+</main>
 
 <footer>
-  <div class="wrap">
-    <ul class="foot-links">
-      <li><a href="https://github.com/borismilner">GitHub</a></li>
-      <li><a href="https://gitlab.com/borismilner">GitLab</a></li>
-      <li><a href="mailto:boris.milner@gmail.com">Email</a></li>
-    </ul>
-    <span class="foot-loc mono">Israel</span>
+  <div class="col">
+    <p class="links">
+      <a href="mailto:boris.milner@gmail.com">boris.milner@gmail.com</a><span>&middot;</span>
+      <a href="https://github.com/borismilner">GitHub</a><span>&middot;</span>
+      <a href="https://gitlab.com/fu-bar/from-github">GitLab</a>
+    </p>
+    <p class="colophon">One HTML file, no build step, no frameworks, set in
+      Charter. <a href="https://github.com/borismilner/borismilner.github.io">View source</a>.</p>
   </div>
 </footer>
+
+<script>
+  document.addEventListener("keydown", function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+    var opt = document.querySelector('.opt[data-key="' + e.key + '"]');
+    if (!opt) return;
+    opt.classList.add("pressed");
+    setTimeout(function () { opt.classList.remove("pressed"); }, 400);
+    var target = document.querySelector(opt.getAttribute("href"));
+    var instant = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    target.scrollIntoView({ behavior: instant ? "auto" : "smooth" });
+    target.querySelector("h2").focus({ preventScroll: true });
+    history.replaceState(null, "", opt.getAttribute("href"));
+  });
+</script>
 
 </body>
 </html>
