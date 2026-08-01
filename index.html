@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <title>Boris Milner</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Boris Milner builds tools for the Linux desktop: grabbit (downloads), qq (a way for AI agents to reach you), snapper (screenshots that never flatten).">
+<meta name="description" content="Boris Milner builds tools for the Linux desktop: qq (a way for AI agents to reach you), snapper (screenshots that never flatten), grabbit (downloads).">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fdfdfb">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#222429">
 <meta property="og:title" content="Boris Milner">
-<meta property="og:description" content="Tools for the Linux desktop: grabbit, qq, snapper. Software should cost you seconds, not context switches.">
+<meta property="og:description" content="Tools for the Linux desktop: qq, snapper, grabbit. Software should cost you seconds, not context switches.">
 <meta property="og:url" content="https://borismilner.github.io">
 <meta property="og:image" content="https://avatars.githubusercontent.com/u/821440?v=4">
 <meta name="twitter:card" content="summary">
@@ -29,6 +29,7 @@
     --snapper-soft: #dcefe6;
     --serif: Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif;
     --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+    --weave-strength: 0.05;
   }
   @media (prefers-color-scheme: dark){
     :root{
@@ -43,6 +44,7 @@
       --qq-soft: #323a58;
       --snapper: #57b98d;
       --snapper-soft: #263e33;
+      --weave-strength: 0.07;
     }
   }
 
@@ -67,6 +69,43 @@
     & ::selection{ background: var(--qq-soft); }
   }
 
+  /* wallpaper: a drifting take on the old X11 root weave */
+  body::before{
+    content: "";
+    position: fixed;
+    inset: -160px;
+    z-index: -2;
+    pointer-events: none;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M-2 14 14 -2M-2 2 2 -2M10 14 14 10' stroke='%23888888' stroke-opacity='.5' fill='none'/%3E%3C/svg%3E");
+    opacity: var(--weave-strength);
+    animation: drift 180s linear infinite;
+  }
+  @keyframes drift{
+    to{ transform: translate3d(120px, 120px, 0); }
+  }
+
+  /* ambient light in the three project colors */
+  body::after{
+    content: "";
+    position: fixed;
+    inset: -5%;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(44rem 30rem at 84% -6%, color-mix(in srgb, var(--qq) 7%, transparent), transparent 68%),
+      radial-gradient(38rem 28rem at -14% 44%, color-mix(in srgb, var(--snapper) 6%, transparent), transparent 68%),
+      radial-gradient(32rem 26rem at 106% 90%, color-mix(in srgb, var(--grabbit) 6%, transparent), transparent 68%);
+    animation: sway 44s ease-in-out infinite alternate;
+  }
+  @keyframes sway{
+    from{ transform: translate3d(-1.5%, 0, 0); }
+    to{ transform: translate3d(1.5%, 1%, 0); }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    body::before, body::after{ animation: none; }
+  }
+
   .col{
     max-width: 41em;
     margin-inline: auto;
@@ -84,6 +123,17 @@
 
   .mono{ font-family: var(--mono); font-size: 0.9em; }
 
+  .glyph{
+    width: 1em;
+    height: 1em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vertical-align: -0.12em;
+  }
+
   /* masthead */
   .masthead{
     padding-top: 76px;
@@ -95,12 +145,25 @@
       letter-spacing: 0.01em;
       margin: 0;
       text-wrap: balance;
+
+      &::after{
+        content: "";
+        display: block;
+        width: 90px;
+        height: 4px;
+        margin-top: 14px;
+        border-radius: 2px;
+        background: linear-gradient(to right,
+          var(--qq) 0 33.4%,
+          var(--snapper) 33.4% 66.7%,
+          var(--grabbit) 66.7% 100%);
+      }
     }
     & .sub{
       font-family: var(--mono);
       font-size: 0.8125rem;
       color: var(--muted);
-      margin: 8px 0 0;
+      margin: 12px 0 0;
     }
   }
 
@@ -122,6 +185,7 @@
     box-shadow: 0 1px 2px rgba(18,18,22,0.05), 0 10px 28px rgba(18,18,22,0.09);
     max-width: 27em;
     overflow: hidden;
+    animation: arrive 0.45s cubic-bezier(0.2, 0.8, 0.3, 1) 0.15s both;
 
     & .bar{
       display: flex;
@@ -132,12 +196,6 @@
       font-family: var(--mono);
       font-size: 0.75rem;
       color: var(--muted);
-
-      & .app-dot{
-        width: 8px; height: 8px;
-        border-radius: 50%;
-        background: var(--qq);
-      }
     }
     & .title{
       padding: 14px 18px 4px;
@@ -154,10 +212,35 @@
     /* spotlight: hovering one option quiets the others */
     & ol:has(.opt:hover) .opt:not(:hover){ opacity: 0.55; }
   }
+  @keyframes arrive{
+    from{ opacity: 0; transform: translateY(14px) scale(0.98); }
+  }
+  .app-dot{
+    position: relative;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--qq);
+
+    /* a question arrives every so often */
+    &::after{
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: 50%;
+      border: 2px solid var(--qq);
+      opacity: 0;
+      animation: ping 11s cubic-bezier(0, 0, 0.2, 1) 3s infinite;
+    }
+  }
+  @keyframes ping{
+    0%{ transform: scale(0.5); opacity: 0.9; }
+    10%{ transform: scale(3.4); opacity: 0; }
+    100%{ transform: scale(3.4); opacity: 0; }
+  }
   .opt{
     display: flex;
     align-items: baseline;
-    gap: 12px;
+    gap: 11px;
     padding: 8px 10px;
     border-radius: 6px;
     text-decoration: none;
@@ -175,6 +258,9 @@
       padding: 1px 7px;
     }
     &.pressed .key{ background: var(--qq); border-color: var(--qq); color: var(--card); }
+
+    & .glyph{ color: var(--muted); align-self: center; flex: none; }
+    &:hover .glyph{ color: var(--ink); }
 
     & .what{ color: var(--muted); font-size: 0.9375rem; }
   }
@@ -201,7 +287,11 @@
     margin: 0 0 4px;
 
     &:focus{ outline: none; }
+    & .glyph{ margin-right: 9px; stroke-width: 2; }
   }
+  #qq h2 .glyph{ color: var(--qq); }
+  #snapper h2 .glyph{ color: var(--snapper); }
+  #grabbit h2 .glyph{ color: var(--grabbit); }
   .role{
     font-family: var(--mono);
     font-size: 0.75rem;
@@ -227,83 +317,27 @@
     }
   }
 
-  /* grabbit: download queue */
-  .queue{
+  /* qq: mascot + shell snippet */
+  .mascot{
+    float: right;
+    width: 200px;
+    height: auto;
+    margin: 6px -10px 14px 22px;
     border: 1px solid var(--card-line);
-    border-radius: 10px;
-    background: var(--card);
-    padding: 4px 0;
-    font-family: var(--mono);
-    font-size: 0.8125rem;
-    font-variant-numeric: tabular-nums;
-
-    & .dl{
-      padding: 12px 16px;
-
-      & + .dl{ border-top: 1px solid var(--line); }
-    }
-    & .top{
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 8px;
-
-      & .spd{ color: var(--grabbit); white-space: nowrap; }
-      & .wait{ color: var(--muted); white-space: nowrap; }
-    }
-    & .name{
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    & .sub{
-      margin-top: 8px;
-      color: var(--muted);
-      font-size: 0.75rem;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(18,18,22,0.1);
+    transform: rotate(-1.5deg);
+  }
+  @media (max-width: 560px){
+    .mascot{
+      float: none;
+      display: block;
+      margin: 0 auto 20px;
+      width: 180px;
     }
   }
-  @container (max-width: 26em){
-    .queue .top{ flex-direction: column; gap: 2px; }
-  }
-  .conns{
-    display: flex;
-    gap: 3px;
-    height: 6px;
+  #qq figure{ clear: right; }
 
-    & span{
-      flex: 1;
-      background: var(--line);
-      border-radius: 3px;
-      position: relative;
-      overflow: hidden;
-
-      &::after{
-        content: "";
-        position: absolute;
-        inset: 0;
-        width: var(--fill, 0%);
-        background: var(--grabbit);
-        border-radius: 3px;
-      }
-    }
-    &.idle span::after{ background: var(--card-line); }
-  }
-  @keyframes fill-up{
-    from{ width: 0%; }
-    to{ width: var(--fill, 0%); }
-  }
-  /* the bars fill as they scroll into view: progress you can feel */
-  @supports (animation-timeline: view()){
-    @media (prefers-reduced-motion: no-preference){
-      .conns:not(.idle) span::after{
-        animation: fill-up linear both;
-        animation-timeline: view();
-        animation-range: entry 40% entry 130%;
-      }
-    }
-  }
-
-  /* qq: shell snippet */
   pre{
     background: var(--card);
     border: 1px solid var(--card-line);
@@ -370,10 +404,19 @@
       }
     }
   }
+  /* marching ants, like a live selection */
   .sel{
     position: absolute;
-    border: 1.5px dashed var(--snapper);
-    border-radius: 2px;
+    --ant: var(--snapper);
+    background-image:
+      linear-gradient(90deg, var(--ant) 55%, transparent 45%),
+      linear-gradient(90deg, var(--ant) 55%, transparent 45%),
+      linear-gradient(0deg, var(--ant) 55%, transparent 45%),
+      linear-gradient(0deg, var(--ant) 55%, transparent 45%);
+    background-size: 9px 1.5px, 9px 1.5px, 1.5px 9px, 1.5px 9px;
+    background-position: 0 0, 0 100%, 0 0, 100% 0;
+    background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+    animation: ants 0.6s linear infinite;
 
     & .h{
       position: absolute;
@@ -387,6 +430,14 @@
       &.bl{ bottom: -4px; left: -4px; }
       &.br{ bottom: -4px; right: -4px; }
     }
+  }
+  @keyframes ants{
+    to{ background-position: 9px 0, -9px 100%, 0 -9px, 100% 9px; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .sel{ animation: none; }
+    .app-dot::after{ animation: none; }
+    .qq-card{ animation: none; }
   }
   .anno-arrow{
     position: absolute;
@@ -430,10 +481,88 @@
         animation-timeline: view();
         animation-range: entry 50% entry 140%;
       }
-      .anno-arrow .head, .anno-pill, .sel{
+      .anno-arrow .head, .anno-pill, .sel-appear{
         animation: appear linear both;
         animation-timeline: view();
         animation-range: entry 110% entry 150%;
+      }
+    }
+  }
+
+  /* grabbit: download queue */
+  .queue{
+    border: 1px solid var(--card-line);
+    border-radius: 10px;
+    background: var(--card);
+    padding: 4px 0;
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
+
+    & .dl{
+      padding: 12px 16px;
+
+      & + .dl{ border-top: 1px solid var(--line); }
+    }
+    & .top{
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+
+      & .spd{ color: var(--grabbit); white-space: nowrap; }
+      & .wait{ color: var(--muted); white-space: nowrap; }
+    }
+    & .name{
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    & .sub{
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+  }
+  @container (max-width: 26em){
+    .queue .top{ flex-direction: column; gap: 2px; }
+  }
+  .conns{
+    display: flex;
+    gap: 3px;
+    height: 6px;
+
+    & span{
+      flex: 1;
+      background: var(--line);
+      border-radius: 3px;
+      position: relative;
+      overflow: hidden;
+
+      &::after{
+        content: "";
+        position: absolute;
+        inset: 0;
+        width: var(--fill, 0%);
+        background: var(--grabbit);
+        border-radius: 3px;
+        transition: width 0.9s ease;
+      }
+    }
+    &.idle span::after{ background: var(--card-line); }
+  }
+  .dl.go .conns.idle span::after{ background: var(--grabbit); }
+  @keyframes fill-up{
+    from{ width: 0%; }
+    to{ width: var(--fill, 0%); }
+  }
+  /* the bars fill as they scroll into view: progress you can feel */
+  @supports (animation-timeline: view()){
+    @media (prefers-reduced-motion: no-preference){
+      .conns:not(.idle) span::after{
+        animation: fill-up linear both;
+        animation-timeline: view();
+        animation-range: entry 40% entry 130%;
       }
     }
   }
@@ -493,6 +622,23 @@
 </head>
 <body>
 
+<svg style="display:none" aria-hidden="true">
+  <symbol id="i-qq" viewBox="0 0 24 24">
+    <rect x="3.2" y="4" width="17.6" height="12.5" rx="3"/>
+    <path d="M8 16.5 6.8 20.2 11.6 16.5"/>
+    <circle cx="7.6" cy="8.3" r="1.1" fill="currentColor" stroke="none"/>
+    <path d="M10.8 8.3h6.4M7 12.2h10.2"/>
+  </symbol>
+  <symbol id="i-snapper" viewBox="0 0 24 24">
+    <path d="M8 3.5H6A2.5 2.5 0 0 0 3.5 6v2M16 3.5h2A2.5 2.5 0 0 1 20.5 6v2M20.5 16v2a2.5 2.5 0 0 1-2.5 2.5h-2M3.5 16v2A2.5 2.5 0 0 0 6 20.5h2"/>
+    <circle cx="12" cy="12" r="3.4"/>
+  </symbol>
+  <symbol id="i-grabbit" viewBox="0 0 24 24">
+    <path d="M12 3.5v9.5M8.2 9.6l3.8 3.8 3.8-3.8"/>
+    <path d="M4 14.5v2.5A3.5 3.5 0 0 0 7.5 20.5h9a3.5 3.5 0 0 0 3.5-3.5v-2.5"/>
+  </symbol>
+</svg>
+
 <header class="masthead col">
   <h1>Boris Milner</h1>
   <p class="sub">software engineer &middot; Israel</p>
@@ -510,76 +656,27 @@
     <div class="bar"><span class="app-dot" aria-hidden="true"></span>qq</div>
     <p class="title">Where do you want to start?</p>
     <ol>
-      <li><a class="opt" href="#grabbit" data-key="1">
-        <span class="key">1</span><span>grabbit</span><span class="what">the download manager</span>
+      <li><a class="opt" href="#qq" data-key="1">
+        <span class="key">1</span><svg class="glyph" aria-hidden="true"><use href="#i-qq"/></svg><span>qq</span><span class="what">this card, actually</span>
       </a></li>
-      <li><a class="opt" href="#qq" data-key="2">
-        <span class="key">2</span><span>qq</span><span class="what">this card, actually</span>
+      <li><a class="opt" href="#snapper" data-key="2">
+        <span class="key">2</span><svg class="glyph" aria-hidden="true"><use href="#i-snapper"/></svg><span>snapper</span><span class="what">the screenshot editor</span>
       </a></li>
-      <li><a class="opt" href="#snapper" data-key="3">
-        <span class="key">3</span><span>snapper</span><span class="what">the screenshot editor</span>
+      <li><a class="opt" href="#grabbit" data-key="3">
+        <span class="key">3</span><svg class="glyph" aria-hidden="true"><use href="#i-grabbit"/></svg><span>grabbit</span><span class="what">the download manager</span>
       </a></li>
     </ol>
   </nav>
-  <p class="card-note">That is a real qq card, the tool in section two.
+  <p class="card-note">That is a real qq card, the first tool below.
     <span class="kbd-hint">The numbers work here too: press 1, 2 or 3.</span></p>
 </div>
 
 <main>
-  <section id="grabbit" class="col">
-    <h2 tabindex="-1">grabbit</h2>
-    <p class="role">download manager &middot; Go, Wails, Svelte</p>
-    <p>
-      A download manager for Linux, built because I loved what JDownloader
-      did and wanted it lean, native and scriptable. Copy a link and grabbit
-      takes it from there: several connections per file, clean resume after
-      a crash or a reboot, multi-part archives grouped into one package.
-    </p>
-    <p>
-      My favorite part is the free-hoster machinery. A countdown timer? It
-      waits it out in the background. A captcha? It opens a real browser
-      window, lets you solve it, then carries the whole solved session
-      (cookies, TLS fingerprint and all) into the download. You do the two
-      seconds only a human can do; it does the rest.
-    </p>
-    <figure>
-      <div class="queue" role="img" aria-label="Mock of the grabbit queue: one package downloading over six connections, one download waiting out a hoster timer">
-        <div class="dl">
-          <div class="top">
-            <span class="name">fedora-workstation.part01.rar &nbsp;+2</span>
-            <span class="spd">14.2 MB/s</span>
-          </div>
-          <div class="conns" aria-hidden="true">
-            <span style="--fill:100%"></span><span style="--fill:100%"></span><span style="--fill:84%"></span><span style="--fill:71%"></span><span style="--fill:52%"></span><span style="--fill:38%"></span>
-          </div>
-          <div class="sub">package &middot; 3 files &middot; 4.7 GB &middot; 6 connections</div>
-        </div>
-        <div class="dl">
-          <div class="top">
-            <span class="name">slow-hoster.net/dataset-2024.zip</span>
-            <span class="wait">timer &middot; 0:42</span>
-          </div>
-          <div class="conns idle" aria-hidden="true">
-            <span></span><span></span><span></span><span></span><span></span><span></span>
-          </div>
-          <div class="sub">waiting out the hoster countdown, no babysitting</div>
-        </div>
-      </div>
-      <figcaption>Per-connection progress, and a countdown nobody has to watch.
-      If your browser supports scroll-driven animations, those bars just filled
-      as you scrolled.</figcaption>
-    </figure>
-    <p>
-      New sites are small YAML or JavaScript profiles dropped in a folder, no
-      rebuild. And everything the desktop app can do, a script or an AI agent
-      can do too, through one control API over MCP and HTTP/JSON-RPC.
-    </p>
-    <p class="meta"><a href="https://github.com/borismilner/grabbit">github.com/borismilner/grabbit</a></p>
-  </section>
-
   <section id="qq" class="col">
-    <h2 tabindex="-1">qq</h2>
+    <h2 tabindex="-1"><svg class="glyph" aria-hidden="true"><use href="#i-qq"/></svg>qq</h2>
     <p class="role">desktop interaction hub for AI agents &middot; Go, Linux/X11</p>
+    <img class="mascot" src="qq-mascot.webp" width="480" height="398"
+         alt="qq's robot mascot holding up a card that asks: perform a file integrity check now? Yes / No">
     <p>
       An agent works for twenty minutes while you are somewhere else. The
       moment it needs one word from you, it either waits in a terminal nobody
@@ -614,7 +711,7 @@ qq notify --level success --title <span class="str">"release is live"</span> \
   </section>
 
   <section id="snapper" class="col">
-    <h2 tabindex="-1">snapper</h2>
+    <h2 tabindex="-1"><svg class="glyph" aria-hidden="true"><use href="#i-snapper"/></svg>snapper</h2>
     <p class="role">screenshot capture and annotation &middot; Go, Gio</p>
     <p>
       snapper takes Flameshot's in-overlay speed and Snagit's magnifier
@@ -640,12 +737,12 @@ qq notify --level success --title <span class="str">"release is live"</span> \
           <path class="head" d="M140 20 L119 27 L130 41 Z" fill="var(--snapper)"/>
         </svg>
         <span class="anno-pill" aria-hidden="true">on by default?</span>
-        <span class="sel" aria-hidden="true" style="left:6%; bottom:16px; width:190px; height:80px;">
+        <span class="sel sel-appear" aria-hidden="true" style="left:6%; bottom:16px; width:190px; height:80px;">
           <span class="h tl"></span><span class="h tr"></span><span class="h bl"></span><span class="h br"></span>
         </span>
       </div>
       <figcaption>Annotations stay objects: that arrow drew itself on the way in,
-      and the handles mean you can still grab it.</figcaption>
+      and the marching ants mean you can still grab it.</figcaption>
     </figure>
     <p>
       The small decisions are where it earns its keep. Annotations pick white
@@ -655,6 +752,56 @@ qq notify --level success --title <span class="str">"release is live"</span> \
       through OCR.
     </p>
     <p class="meta"><a href="https://github.com/borismilner/snapper">github.com/borismilner/snapper</a></p>
+  </section>
+
+  <section id="grabbit" class="col">
+    <h2 tabindex="-1"><svg class="glyph" aria-hidden="true"><use href="#i-grabbit"/></svg>grabbit</h2>
+    <p class="role">download manager &middot; Go, Wails, Svelte</p>
+    <p>
+      A download manager for Linux, built because I loved what JDownloader
+      did and wanted it lean, native and scriptable. Copy a link and grabbit
+      takes it from there: several connections per file, clean resume after
+      a crash or a reboot, multi-part archives grouped into one package.
+    </p>
+    <p>
+      My favorite part is the free-hoster machinery. A countdown timer? It
+      waits it out in the background. A captcha? It opens a real browser
+      window, lets you solve it, then carries the whole solved session
+      (cookies, TLS fingerprint and all) into the download. You do the two
+      seconds only a human can do; it does the rest.
+    </p>
+    <figure>
+      <div class="queue" role="img" aria-label="Mock of the grabbit queue: one package downloading over six connections, one download waiting out a hoster timer">
+        <div class="dl active">
+          <div class="top">
+            <span class="name">fedora-workstation.part01.rar &nbsp;+2</span>
+            <span class="spd">14.2 MB/s</span>
+          </div>
+          <div class="conns" aria-hidden="true">
+            <span style="--fill:100%"></span><span style="--fill:100%"></span><span style="--fill:84%"></span><span style="--fill:71%"></span><span style="--fill:52%"></span><span style="--fill:38%"></span>
+          </div>
+          <div class="sub">package &middot; 3 files &middot; 4.7 GB &middot; 6 connections</div>
+        </div>
+        <div class="dl waiting">
+          <div class="top">
+            <span class="name">slow-hoster.net/dataset-2024.zip</span>
+            <span class="wait">timer &middot; 0:09</span>
+          </div>
+          <div class="conns idle" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <div class="sub">waiting out the hoster countdown, no babysitting</div>
+        </div>
+      </div>
+      <figcaption>Per-connection progress, and a countdown nobody has to watch.
+      Stay on this one a few seconds; the timer is real.</figcaption>
+    </figure>
+    <p>
+      New sites are small YAML or JavaScript profiles dropped in a folder, no
+      rebuild. And everything the desktop app can do, a script or an AI agent
+      can do too, through one control API over MCP and HTTP/JSON-RPC.
+    </p>
+    <p class="meta"><a href="https://github.com/borismilner/grabbit">github.com/borismilner/grabbit</a></p>
   </section>
 
   <section id="archive" class="col">
@@ -698,8 +845,8 @@ qq notify --level success --title <span class="str">"release is live"</span> \
       <a href="https://github.com/borismilner">GitHub</a><span>&middot;</span>
       <a href="https://gitlab.com/fu-bar/from-github">GitLab</a>
     </p>
-    <p class="colophon">One HTML file, no build step, no frameworks, set in
-      Charter. <a href="https://github.com/borismilner/borismilner.github.io">View source</a>.</p>
+    <p class="colophon">No build step, no frameworks, set in Charter.
+      <a href="https://github.com/borismilner/borismilner.github.io">View source</a>.</p>
   </div>
 </footer>
 
@@ -717,6 +864,45 @@ qq notify --level success --title <span class="str">"release is live"</span> \
     target.querySelector("h2").focus({ preventScroll: true });
     history.replaceState(null, "", opt.getAttribute("href"));
   });
+
+  /* the grabbit queue is a tiny piece of theater: the hoster countdown
+     really ticks, and when it reaches zero the download starts */
+  (function () {
+    var wait = document.querySelector(".dl.waiting");
+    if (!wait || !("IntersectionObserver" in window)) return;
+    var timerEl = wait.querySelector(".wait");
+    var subEl = wait.querySelector(".sub");
+    var bars = wait.querySelectorAll(".conns span");
+    var spd = document.querySelector(".dl.active .spd");
+    var calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var t = 9;
+    var started = false;
+
+    var io = new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting || started) return;
+      started = true;
+      io.disconnect();
+      tick();
+      if (!calm) jitter();
+    }, { threshold: 0.6 });
+    io.observe(wait);
+
+    function tick() {
+      timerEl.textContent = "timer · 0:0" + t;
+      if (t-- > 0) { setTimeout(tick, 1000); return; }
+      wait.classList.add("go");
+      timerEl.textContent = "2.6 MB/s";
+      timerEl.className = "spd";
+      subEl.textContent = "countdown done, downloading";
+      var fills = [34, 29, 24, 19, 13, 8];
+      bars.forEach(function (b, i) { b.style.setProperty("--fill", fills[i] + "%"); });
+    }
+
+    function jitter() {
+      if (spd) spd.textContent = (13.4 + Math.random() * 1.7).toFixed(1) + " MB/s";
+      setTimeout(jitter, 1150);
+    }
+  })();
 </script>
 
 </body>
