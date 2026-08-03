@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <title>Boris Milner</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Boris Milner builds tools for the Linux desktop: qq (a way for AI agents to reach you), snapper (screenshots that never flatten), grabbit (downloads).">
+<meta name="description" content="Boris Milner builds tools for the Linux desktop: AgentBox (a way for AI agents to reach you), snapper (screenshots that never flatten), grabbit (downloads).">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fdfdfb">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#222429">
 <meta property="og:title" content="Boris Milner">
-<meta property="og:description" content="Tools for the Linux desktop: qq, snapper, grabbit. Software should cost you seconds, not context switches.">
+<meta property="og:description" content="Tools for the Linux desktop: AgentBox, snapper, grabbit. Software should cost you seconds, not context switches.">
 <meta property="og:url" content="https://borismilner.github.io">
 <meta property="og:image" content="https://avatars.githubusercontent.com/u/821440?v=4">
 <meta name="twitter:card" content="summary">
@@ -23,8 +23,8 @@
     --card: #ffffff;
     --card-line: #d8d6cf;
     --grabbit: #c78d2b;
-    --qq: #5b6ee0;
-    --qq-soft: #e9ecfb;
+    --agentbox: #5b6ee0;
+    --agentbox-soft: #e9ecfb;
     --snapper: #35916b;
     --snapper-soft: #dcefe6;
     --serif: Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif;
@@ -40,8 +40,8 @@
       --card: #2a2d33;
       --card-line: #45484f;
       --grabbit: #d9a441;
-      --qq: #8b9af0;
-      --qq-soft: #323a58;
+      --agentbox: #8b9af0;
+      --agentbox-soft: #323a58;
       --snapper: #57b98d;
       --snapper-soft: #263e33;
       --weave-strength: 0.07;
@@ -66,7 +66,7 @@
     font-size: 1.0625rem;
     line-height: 1.6;
 
-    & ::selection{ background: var(--qq-soft); }
+    & ::selection{ background: var(--agentbox-soft); }
   }
 
   /* wallpaper: a drifting take on the old X11 root weave */
@@ -92,7 +92,7 @@
     z-index: -1;
     pointer-events: none;
     background:
-      radial-gradient(44rem 30rem at 84% -6%, color-mix(in srgb, var(--qq) 7%, transparent), transparent 68%),
+      radial-gradient(44rem 30rem at 84% -6%, color-mix(in srgb, var(--agentbox) 7%, transparent), transparent 68%),
       radial-gradient(38rem 28rem at -14% 44%, color-mix(in srgb, var(--snapper) 6%, transparent), transparent 68%),
       radial-gradient(32rem 26rem at 106% 90%, color-mix(in srgb, var(--grabbit) 6%, transparent), transparent 68%);
     animation: sway 44s ease-in-out infinite alternate;
@@ -118,7 +118,7 @@
     text-underline-offset: 2px;
 
     &:hover{ text-decoration-thickness: 2px; }
-    &:focus-visible{ outline: 2px solid var(--qq); outline-offset: 2px; border-radius: 2px; }
+    &:focus-visible{ outline: 2px solid var(--agentbox); outline-offset: 2px; border-radius: 2px; }
   }
 
   .mono{ font-family: var(--mono); font-size: 0.9em; }
@@ -154,7 +154,7 @@
         margin-top: 14px;
         border-radius: 2px;
         background: linear-gradient(to right,
-          var(--qq) 0 33.4%,
+          var(--agentbox) 0 33.4%,
           var(--snapper) 33.4% 66.7%,
           var(--grabbit) 66.7% 100%);
       }
@@ -173,12 +173,12 @@
     text-wrap: pretty;
   }
 
-  /* the qq card: hero and navigation in one */
+  /* the agentbox card: hero and navigation in one */
   .card-seat{
     margin-top: 44px;
     container-type: inline-size;
   }
-  .qq-card{
+  .agentbox-card{
     background: var(--card);
     border: 1px solid var(--card-line);
     border-radius: 10px;
@@ -219,7 +219,7 @@
     position: relative;
     width: 8px; height: 8px;
     border-radius: 50%;
-    background: var(--qq);
+    background: var(--agentbox);
 
     /* a question arrives every so often */
     &::after{
@@ -227,7 +227,7 @@
       position: absolute;
       inset: -2px;
       border-radius: 50%;
-      border: 2px solid var(--qq);
+      border: 2px solid var(--agentbox);
       opacity: 0;
       animation: ping 11s cubic-bezier(0, 0, 0.2, 1) 3s infinite;
     }
@@ -246,18 +246,18 @@
     text-decoration: none;
     transition: opacity 0.15s ease;
 
-    &:hover, &.pressed{ background: var(--qq-soft); }
+    &:hover, &.pressed{ background: var(--agentbox-soft); }
 
     & .key{
       font-family: var(--mono);
       font-size: 0.75rem;
-      color: var(--qq);
+      color: var(--agentbox);
       border: 1px solid var(--card-line);
       border-bottom-width: 2px;
       border-radius: 4px;
       padding: 1px 7px;
     }
-    &.pressed .key{ background: var(--qq); border-color: var(--qq); color: var(--card); }
+    &.pressed .key{ background: var(--agentbox); border-color: var(--agentbox); color: var(--card); }
 
     & .glyph{ color: var(--muted); align-self: center; flex: none; }
     &:hover .glyph{ color: var(--ink); }
@@ -289,7 +289,7 @@
     &:focus{ outline: none; }
     & .glyph{ margin-right: 9px; stroke-width: 2; }
   }
-  #qq h2 .glyph{ color: var(--qq); }
+  #agentbox h2 .glyph{ color: var(--agentbox); }
   #snapper h2 .glyph{ color: var(--snapper); }
   #grabbit h2 .glyph{ color: var(--grabbit); }
   .role{
@@ -317,7 +317,7 @@
     }
   }
 
-  /* qq: mascot + shell snippet */
+  /* agentbox: mascot + shell snippet */
   .mascot{
     float: right;
     width: 200px;
@@ -336,7 +336,7 @@
       width: 180px;
     }
   }
-  #qq figure{ clear: right; }
+  #agentbox figure{ clear: right; }
 
   pre{
     background: var(--card);
@@ -350,7 +350,7 @@
     margin: 0;
 
     & .cm{ color: var(--muted); }
-    & .kw{ color: var(--qq); }
+    & .kw{ color: var(--agentbox); }
     & .str{ color: var(--snapper); }
   }
 
@@ -437,7 +437,7 @@
   @media (prefers-reduced-motion: reduce){
     .sel{ animation: none; }
     .app-dot::after{ animation: none; }
-    .qq-card{ animation: none; }
+    .agentbox-card{ animation: none; }
   }
   .anno-arrow{
     position: absolute;
@@ -623,7 +623,7 @@
 <body>
 
 <svg style="display:none" aria-hidden="true">
-  <symbol id="i-qq" viewBox="0 0 24 24">
+  <symbol id="i-agentbox" viewBox="0 0 24 24">
     <rect x="3.2" y="4" width="17.6" height="12.5" rx="3"/>
     <path d="M8 16.5 6.8 20.2 11.6 16.5"/>
     <circle cx="7.6" cy="8.3" r="1.1" fill="currentColor" stroke="none"/>
@@ -652,12 +652,12 @@
 </header>
 
 <div class="card-seat col">
-  <nav class="qq-card" aria-label="Projects">
-    <div class="bar"><span class="app-dot" aria-hidden="true"></span>qq</div>
+  <nav class="agentbox-card" aria-label="Projects">
+    <div class="bar"><span class="app-dot" aria-hidden="true"></span>agentbox</div>
     <p class="title">Where do you want to start?</p>
     <ol>
-      <li><a class="opt" href="#qq" data-key="1">
-        <span class="key">1</span><svg class="glyph" aria-hidden="true"><use href="#i-qq"/></svg><span>qq</span><span class="what">this card, actually</span>
+      <li><a class="opt" href="#agentbox" data-key="1">
+        <span class="key">1</span><svg class="glyph" aria-hidden="true"><use href="#i-agentbox"/></svg><span>AgentBox</span><span class="what">this card, actually</span>
       </a></li>
       <li><a class="opt" href="#snapper" data-key="2">
         <span class="key">2</span><svg class="glyph" aria-hidden="true"><use href="#i-snapper"/></svg><span>snapper</span><span class="what">the screenshot editor</span>
@@ -667,20 +667,20 @@
       </a></li>
     </ol>
   </nav>
-  <p class="card-note">That is a real qq card, the first tool below.
+  <p class="card-note">That is a real AgentBox card, the first tool below.
     <span class="kbd-hint">The numbers work here too: press 1, 2 or 3.</span></p>
 </div>
 
 <main>
-  <section id="qq" class="col">
-    <h2 tabindex="-1"><svg class="glyph" aria-hidden="true"><use href="#i-qq"/></svg>qq</h2>
+  <section id="agentbox" class="col">
+    <h2 tabindex="-1"><svg class="glyph" aria-hidden="true"><use href="#i-agentbox"/></svg>AgentBox</h2>
     <p class="role">desktop interaction hub for AI agents &middot; Go, Linux/X11</p>
-    <img class="mascot" src="qq-mascot.webp" width="480" height="398"
-         alt="qq's robot mascot holding up a card that asks: perform a file integrity check now? Yes / No">
+    <img class="mascot" src="agentbox-mascot.webp" width="480" height="398"
+         alt="AgentBox's robot mascot holding up a card that asks: perform a file integrity check now? Yes / No">
     <p>
       An agent works for twenty minutes while you are somewhere else. The
       moment it needs one word from you, it either waits in a terminal nobody
-      is watching, or it guesses, and you find out later in the diff. qq is
+      is watching, or it guesses, and you find out later in the diff. AgentBox is
       the third option.
     </p>
     <p>
@@ -692,11 +692,11 @@
       behind an undo strip.
     </p>
     <figure>
-      <pre><code><span class="kw">if</span> qq confirm --title <span class="str">"Push to main?"</span> --body <span class="str">"12 commits, tests green"</span>; <span class="kw">then</span>
+      <pre><code><span class="kw">if</span> agentbox confirm --title <span class="str">"Push to main?"</span> --body <span class="str">"12 commits, tests green"</span>; <span class="kw">then</span>
     git push
 <span class="kw">fi</span>
 
-qq notify --level success --title <span class="str">"release is live"</span> \
+agentbox notify --level success --title <span class="str">"release is live"</span> \
           --speak <span class="str">"the release is out"</span>   <span class="cm"># non-blocking, spoken aloud</span></code></pre>
       <figcaption>Every tool is also a CLI. Blocking calls map the answer to an exit
       code, so a shell script can branch on a human without parsing anything.</figcaption>
@@ -707,7 +707,7 @@ qq notify --level success --title <span class="str">"release is live"</span> \
       of them over MCP and the same twenty from the shell. And all of it
       local: no cloud, no account, nothing leaves the machine.
     </p>
-    <p class="meta"><a href="https://github.com/borismilner/qq">github.com/borismilner/qq</a></p>
+    <p class="meta"><a href="https://github.com/borismilner/agentbox">github.com/borismilner/agentbox</a></p>
   </section>
 
   <section id="snapper" class="col">
