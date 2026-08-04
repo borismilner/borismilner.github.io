@@ -82,9 +82,10 @@ verified live. He said "looks great" and called `/handoff`.
   (`--user-data-dir=/tmp/claude-1000/.../chrome-profile*`) are killed. Chrome
   PID 12117 is **Boris's own** browser - leave it alone.
 - PRs: none. This repo does not use PRs; `master` is the deploy branch.
-- Git: `master` at `3114c76`, pushed, working tree clean apart from the final
-  edit to this file. `d7378bf` is the last commit that touched the site itself;
-  `f2119c8` added this doc and `3114c76` the Pages exclude.
+- Git: `master` clean and fully pushed. **`d7378bf` is the last commit that
+  touched the site itself**; everything after it is docs (`f2119c8` this file,
+  `3114c76` the Pages exclude, then this doc's own corrections). Run
+  `git log --oneline -6` for the real tip rather than trusting this line.
 - In-flight edits: none.
 
 ## Blocked on you (Boris)
