@@ -1,0 +1,6 @@
+# Pages serves everything in this repo by default. HANDOFF.md is a working
+# document for whoever picks the site up next, not a page: keep it in git, keep
+# it off the web.
+exclude:
+  - HANDOFF.md
+  - _config.yml
