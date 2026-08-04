@@ -1,9 +1,14 @@
 # Handoff - borismilner.github.io (personal site)
 
-**Written:** 2026-08-04 · **Assignment:** /home/boris-milner/me/projects/borismilner.github.io · **Type:** personal
+**Written:** 2026-08-05 (session of 2026-08-04) · **Assignment:** /home/boris-milner/me/projects/borismilner.github.io · **Type:** personal
 
 This repo has no other docs. This file is the entry point: read it, then read
 `index.html` (it is the whole site).
+
+**Anything you add to this repo is published.** Pages serves the whole tree, so
+a new doc appears on the public site unless you list it in `_config.yml`'s
+`exclude:` - that is the only reason that file exists. This handoff is in git
+(so it reaches the VM) and returns 404 on the web. Verified both.
 
 ## Do this next
 
@@ -77,7 +82,9 @@ verified live. He said "looks great" and called `/handoff`.
   (`--user-data-dir=/tmp/claude-1000/.../chrome-profile*`) are killed. Chrome
   PID 12117 is **Boris's own** browser - leave it alone.
 - PRs: none. This repo does not use PRs; `master` is the deploy branch.
-- Git: `master` at `d7378bf`, pushed, working tree clean (before this doc).
+- Git: `master` at `3114c76`, pushed, working tree clean apart from the final
+  edit to this file. `d7378bf` is the last commit that touched the site itself;
+  `f2119c8` added this doc and `3114c76` the Pages exclude.
 - In-flight edits: none.
 
 ## Blocked on you (Boris)
@@ -112,7 +119,9 @@ Verified this session, in a real headless Chrome 151 at the widths above:
   (observed: 8200 180deg/+375, Rafael 123deg/+416, Intel 233deg/-382).
 - [verified] The reading rail is `scale: 0 1` at the top and `1` at the bottom.
 - [verified] No console errors or warnings.
-- [verified] `https://borismilner.github.io/` serves `d7378bf`.
+- [verified] `https://borismilner.github.io/` serves `d7378bf`, and after the
+  `_config.yml` exclude the site is still 200 while `/HANDOFF.md` and
+  `/HANDOFF.html` are 404.
 
 Re-check before relying on these:
 
@@ -196,5 +205,7 @@ Re-check before relying on these:
    light-run scheduler.
 3. `boris.webp` - hero portrait. `agentbox-mascot.webp` - AgentBox section aside.
    `card.jpg` - OG preview, **stale**.
-4. Live: https://borismilner.github.io/ · Source:
+4. `_config.yml` - Pages build config, and the only thing in it is the list of
+   files to keep off the web. Add any future doc there.
+5. Live: https://borismilner.github.io/ · Source:
    https://github.com/borismilner/borismilner.github.io
