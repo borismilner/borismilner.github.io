@@ -50,6 +50,10 @@
     --arc-core: #f2fbff;
     --arc-mid: #6cc6f2;
     --arc-tail: #6f7fe8;
+    /* how far a mock or an aside may reach past the prose column, per side.
+       rem, not em: this value is read by elements at different font sizes
+       (figure, figcaption) and must resolve to the same pixels in each */
+    --bleed: 0rem;
     --serif: Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif;
     --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
     --weave-strength: 0.05;
@@ -80,6 +84,11 @@
       --art-blend: normal;
     }
   }
+
+  /* em, not px: the prose column is em-based too, so a reader with a large
+     default font still has gutter to spare before a mock reaches into it */
+  @media (min-width: 74em){ :root{ --bleed: 4rem; } }
+  @media (min-width: 90em){ :root{ --bleed: 7rem; } }
 
   *, *::before, *::after{ box-sizing: border-box; }
 
@@ -624,48 +633,51 @@
     color: var(--muted);
   }
 
+  /* a mock reaches into both gutters by the same amount, so the section stays
+     centred on the prose column; the caption returns to the text edge */
   figure{
-    margin: 26px 0;
+    margin: 30px 0;
+    width: calc(100% + var(--bleed) * 2);
+    margin-inline: calc(var(--bleed) * -1);
     container-type: inline-size;
-    transition: width .2s ease;
 
     & figcaption{
-      margin-top: 10px;
+      margin: 10px var(--bleed) 0;
       font-size: 0.875rem;
       color: var(--muted);
       text-wrap: pretty;
     }
   }
 
-  /* wide screens: let the mocks use the gutter the prose should not */
-  @media (min-width: 1200px){
-    main section figure{ width: calc(100% + 9em); }
-  }
-  @media (min-width: 1500px){
-    main section figure{ width: calc(100% + 15em); }
-  }
-
   /* ---------------- agentbox: mascot + shell snippet ---------------- */
 
+  /* the mascot is a column of its own rather than a float: text that wraps
+     around a picture and then widens again reads as an accident. on wide
+     screens the picture steps into the gutter so the prose keeps its measure */
+  .with-mascot{
+    display: grid;
+    gap: 4px 26px;
+    margin-bottom: 18px;
+  }
+  @media (min-width: 700px){
+    .with-mascot{
+      grid-template-columns: minmax(0, 1fr) 11rem;
+      align-items: start;
+      width: calc(100% + var(--bleed));
+      margin-bottom: 8px;
+    }
+    .with-mascot p{ margin-bottom: 0; }
+  }
   .mascot{
-    float: right;
-    width: 200px;
+    width: 100%;
+    max-width: 11rem;
     height: auto;
-    margin: 6px -10px 14px 22px;
+    justify-self: center;
     border: 1px solid var(--card-line);
     border-radius: 12px;
     box-shadow: 0 6px 18px rgba(18,18,22,0.1);
-    transform: rotate(-1.5deg);
+    transform: rotate(-1.25deg);
   }
-  @media (max-width: 560px){
-    .mascot{
-      float: none;
-      display: block;
-      margin: 0 auto 20px;
-      width: 180px;
-    }
-  }
-  #agentbox figure{ clear: right; }
 
   pre{
     background: var(--card);
@@ -693,10 +705,23 @@
     padding: 36px 20px 52px;
     overflow: hidden;
   }
+  /* the shot and the annotation hanging off its left edge are one composition:
+     centring the pair (rather than the window alone) is what keeps the figure
+     balanced when it bleeds into the gutters. the left padding is the canvas
+     room the annotation needs; a narrow figure gives it up and the annotation
+     goes back over the shot itself. */
+  .shot{
+    position: relative;
+    max-width: 34rem;
+    margin-inline: auto;
+    padding-left: 9rem;
+  }
+  @container (max-width: 36em){
+    .shot{ padding-left: 0; }
+  }
   .fake-win{
     border: 1px solid var(--card-line);
     border-radius: 8px;
-    max-width: 22em;
     margin: 0 auto;
     background: var(--paper);
 
@@ -778,10 +803,13 @@
       stroke-dashoffset: 0;
     }
   }
+  /* the annotation sits against the shot's bottom-left, where the checkbox it
+     points at is; negative offsets put the arrow's tail on the canvas outside
+     the shot, the way a real annotation is drawn */
   .anno-pill{
     position: absolute;
-    left: 7%;
-    bottom: 66px;
+    left: 8px;
+    bottom: 30px;
     font-family: var(--mono);
     font-size: 0.6875rem;
     color: var(--ink);
@@ -821,7 +849,11 @@
 
   /* ---------------- grabbit: download queue ---------------- */
 
+  /* the queue is a list of rows: past this width it stops looking denser and
+     just looks stretched, so it takes only part of the figure's bleed */
   .queue{
+    max-width: 42rem;
+    margin-inline: auto;
     border: 1px solid var(--card-line);
     border-radius: 10px;
     background: var(--card);
@@ -1088,14 +1120,16 @@
   <section id="agentbox" class="col">
     <h2 tabindex="-1"><svg class="glyph" aria-hidden="true"><use href="#i-agentbox"/></svg>AgentBox</h2>
     <p class="role">desktop interaction hub for AI agents &middot; Go, Linux/X11</p>
-    <img class="mascot" src="agentbox-mascot.webp" width="480" height="398" loading="lazy"
-         alt="AgentBox's robot mascot holding up a card that asks: perform a file integrity check now? Yes / No">
-    <p>
-      An agent works for twenty minutes while you are somewhere else. The
-      moment it needs one word from you, it either waits in a terminal nobody
-      is watching, or it guesses, and you find out later in the diff. AgentBox is
-      the third option.
-    </p>
+    <div class="with-mascot">
+      <p>
+        An agent works for twenty minutes while you are somewhere else. The
+        moment it needs one word from you, it either waits in a terminal nobody
+        is watching, or it guesses, and you find out later in the diff. AgentBox is
+        the third option.
+      </p>
+      <img class="mascot" src="agentbox-mascot.webp" width="480" height="398" loading="lazy"
+           alt="AgentBox's robot mascot holding up a card that asks: perform a file integrity check now? Yes / No">
+    </div>
     <p>
       When an agent needs a decision, a credential or an approval, a card
       appears over whatever you are doing. A short sound tells you what kind
@@ -1105,12 +1139,13 @@
       behind an undo strip.
     </p>
     <figure>
-      <pre><code><span class="kw">if</span> agentbox confirm --title <span class="str">"Push to main?"</span> --body <span class="str">"12 commits, tests green"</span>; <span class="kw">then</span>
+      <pre><code><span class="kw">if</span> agentbox confirm --title <span class="str">"Push to main?"</span> \
+                    --body <span class="str">"12 commits, tests green"</span>; <span class="kw">then</span>
     git push
 <span class="kw">fi</span>
 
 agentbox notify --level success --title <span class="str">"release is live"</span> \
-          --speak <span class="str">"the release is out"</span>   <span class="cm"># non-blocking, spoken aloud</span></code></pre>
+                --speak <span class="str">"the release is out"</span>   <span class="cm"># spoken, non-blocking</span></code></pre>
       <figcaption>Every tool is also a CLI. Blocking calls map the answer to an exit
       code, so a shell script can branch on a human without parsing anything.</figcaption>
     </figure>
@@ -1135,23 +1170,25 @@ agentbox notify --level success --title <span class="str">"release is live"</spa
     </p>
     <figure>
       <div class="capture" role="img" aria-label="Mock of the Snapper editor: a captured settings window with a selected arrow annotation and a label pill">
-        <div class="fake-win" aria-hidden="true">
-          <div class="win-bar">settings.png</div>
-          <div class="win-body">
-            <div class="fake-line mid"></div>
-            <div class="fake-line short"></div>
-            <div class="fake-line"></div>
-            <div class="fake-check"><span class="box"></span>enable telemetry</div>
+        <div class="shot">
+          <div class="fake-win" aria-hidden="true">
+            <div class="win-bar">settings.png</div>
+            <div class="win-body">
+              <div class="fake-line mid"></div>
+              <div class="fake-line short"></div>
+              <div class="fake-line"></div>
+              <div class="fake-check"><span class="box"></span>enable telemetry</div>
+            </div>
           </div>
+          <svg class="anno-arrow" aria-hidden="true" style="left:20px; bottom:-18px; width:170px; height:74px;" viewBox="0 0 170 74">
+            <path class="shaft" pathLength="1" d="M6 68 C 50 62, 96 52, 128 30" fill="none" stroke="var(--snapper)" stroke-width="3" stroke-linecap="round"/>
+            <path class="head" d="M140 20 L119 27 L130 41 Z" fill="var(--snapper)"/>
+          </svg>
+          <span class="anno-pill" aria-hidden="true">on by default?</span>
+          <span class="sel sel-appear" aria-hidden="true" style="left:0; bottom:-22px; width:190px; height:80px;">
+            <span class="h tl"></span><span class="h tr"></span><span class="h bl"></span><span class="h br"></span>
+          </span>
         </div>
-        <svg class="anno-arrow" aria-hidden="true" style="left:9%; bottom:18px; width:170px; height:74px;" viewBox="0 0 170 74">
-          <path class="shaft" pathLength="1" d="M6 68 C 50 62, 96 52, 128 30" fill="none" stroke="var(--snapper)" stroke-width="3" stroke-linecap="round"/>
-          <path class="head" d="M140 20 L119 27 L130 41 Z" fill="var(--snapper)"/>
-        </svg>
-        <span class="anno-pill" aria-hidden="true">on by default?</span>
-        <span class="sel sel-appear" aria-hidden="true" style="left:6%; bottom:16px; width:190px; height:80px;">
-          <span class="h tl"></span><span class="h tr"></span><span class="h bl"></span><span class="h br"></span>
-        </span>
       </div>
       <figcaption>Annotations stay objects: that arrow drew itself on the way in,
       and the marching ants mean you can still grab it.</figcaption>
