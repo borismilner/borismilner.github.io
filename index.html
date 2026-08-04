@@ -5,12 +5,12 @@
 <title>Boris Milner</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="author" content="Boris Milner">
-<meta name="description" content="Boris Milner, backend and infrastructure engineer in Tel Aviv. Fourteen years from silicon validation to reverse engineering to large-scale data platforms, now container image security. Builds Linux desktop tools: AgentBox, snapper, grabbit.">
+<meta name="description" content="Boris Milner, backend and infrastructure engineer in Tel Aviv. Fourteen years from silicon validation to reverse engineering to large-scale data platforms, now container image security. Builds Linux desktop tools: AgentBox, Snapper, Grabbit.">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fdfdfb">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#222429">
 <meta property="og:type" content="profile">
 <meta property="og:title" content="Boris Milner">
-<meta property="og:description" content="Backend and infrastructure engineer in Tel Aviv. Fourteen years, silicon to large-scale data platforms, now container image security. Linux desktop tools: AgentBox, snapper, grabbit.">
+<meta property="og:description" content="Backend and infrastructure engineer in Tel Aviv. Fourteen years, silicon to large-scale data platforms, now container image security. Linux desktop tools: AgentBox, Snapper, Grabbit.">
 <meta property="og:url" content="https://borismilner.github.io">
 <meta property="og:image" content="https://borismilner.github.io/card.jpg">
 <meta property="og:image:width" content="1200">
@@ -41,10 +41,15 @@
     --card: #ffffff;
     --card-line: #d8d6cf;
     --grabbit: #c78d2b;
+    --grabbit-soft: #f6ecd8;
     --agentbox: #5b6ee0;
     --agentbox-soft: #e9ecfb;
     --snapper: #35916b;
     --snapper-soft: #dcefe6;
+    /* the light that runs around a bubble: cool, near-white at the head */
+    --arc-core: #f2fbff;
+    --arc-mid: #6cc6f2;
+    --arc-tail: #6f7fe8;
     --serif: Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif;
     --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
     --weave-strength: 0.05;
@@ -63,6 +68,7 @@
       --card: #2a2d33;
       --card-line: #45484f;
       --grabbit: #d9a441;
+      --grabbit-soft: #43351c;
       --agentbox: #8b9af0;
       --agentbox-soft: #323a58;
       --snapper: #57b98d;
@@ -166,6 +172,13 @@
     stroke-linejoin: round;
     vertical-align: -0.12em;
   }
+  /* brand marks are solid shapes, not line drawings */
+  .brand{
+    width: 1.05em;
+    height: 1.05em;
+    fill: currentColor;
+    stroke: none;
+  }
 
   /* ---------------- masthead ---------------- */
 
@@ -233,6 +246,7 @@
   .art-wrap{
     position: relative;
     aspect-ratio: 1024 / 768;
+    container-type: inline-size;
   }
   .art{
     position: absolute;
@@ -259,9 +273,11 @@
   }
 
   /* places I have worked, drifting around him */
+  /* the art deliberately reaches 48px back under the prose column; the bubble
+     field starts just clear of that, so no bubble ever lands on a line of text */
   .bubbles{
     position: absolute;
-    inset: -7% 0;
+    inset: -8% 0 -6% 54px;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -274,14 +290,14 @@
     align-items: center;
     justify-content: center;
     gap: 3px;
-    width: 5.9rem;
-    height: 5.9rem;
+    width: clamp(4.5rem, 26cqw, 5.9rem);
+    height: clamp(4.5rem, 26cqw, 5.9rem);
     border-radius: 50%;
     background: color-mix(in srgb, var(--card) 88%, transparent);
     border: 1px solid var(--card-line);
     box-shadow: 0 2px 10px rgba(18,18,22,0.07);
     font-family: var(--mono);
-    font-size: 0.6rem;
+    font-size: clamp(0.5rem, 3cqw, 0.6rem);
     line-height: 1.25;
     letter-spacing: 0.02em;
     text-align: center;
@@ -289,23 +305,80 @@
     padding: 4px;
     text-wrap: balance;
     animation: bob 7s ease-in-out infinite alternate;
+    transition: border-color .35s ease;
   }
   .bubble b{ color: var(--ink); font-weight: 400; display: block; }
-  .bubble:nth-child(1){ top: 1%;  right: 4%;  animation-duration: 6.5s; }
-  .bubble:nth-child(2){ top: 27%; right: 0;   animation-duration: 8.5s; animation-delay: -2s; }
-  .bubble:nth-child(3){ bottom: 21%; right: 3%; animation-duration: 7.5s; animation-delay: -4s; }
-  .bubble:nth-child(4){ bottom: 1%; left: 34%; animation-duration: 9s;   animation-delay: -1s; }
-  .bubble:nth-child(5){ top: 9%;  left: 6%;   animation-duration: 8s;   animation-delay: -3s; }
+  .bubble:nth-child(1){ top: 0;    right: 4%;  animation-duration: 6.5s; }
+  .bubble:nth-child(2){ top: 26%;  right: 0;   animation-duration: 8.5s; animation-delay: -2s; }
+  .bubble:nth-child(3){ bottom: 22%; right: 3%; animation-duration: 7.5s; animation-delay: -4s; }
+  .bubble:nth-child(4){ bottom: 0;  left: 35%; animation-duration: 9s;   animation-delay: -1s; }
+  .bubble:nth-child(5){ top: 6%;   left: 5%;   animation-duration: 8s;   animation-delay: -3s; }
+  .bubble:nth-child(6){ bottom: 17%; left: 0;  animation-duration: 7.8s; animation-delay: -5s; }
   @keyframes bob{
     from{ transform: translateY(-7px); }
     to{ transform: translateY(7px); }
   }
+
+  /* a cool light runs once around the rim of a single bubble, then leaves.
+     the ring is a conic sweep masked to 2px; the halo is the same light bleeding
+     outward. both sit on pseudo-elements so the bobbing transform stays free.
+     one bubble at a time, and the JS spaces the turns far apart on purpose. */
+  .bubble::before, .bubble::after{
+    content: "";
+    position: absolute;
+    border-radius: inherit;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .bubble::before{
+    inset: -3px;
+    padding: 2px;
+    background: conic-gradient(from 0deg,
+      transparent 0 52%,
+      color-mix(in srgb, var(--arc-tail) 35%, transparent) 66%,
+      var(--arc-mid) 80%,
+      var(--arc-core) 88%,
+      color-mix(in srgb, var(--arc-core) 70%, transparent) 92%,
+      transparent 97% 100%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    filter: blur(0.7px);
+  }
+  .bubble::after{
+    inset: -12px;
+    background: radial-gradient(closest-side,
+      transparent 60%,
+      color-mix(in srgb, var(--arc-mid) 34%, transparent) 78%,
+      transparent 100%);
+    filter: blur(8px);
+  }
+  .bubble.blaze{ border-color: color-mix(in srgb, var(--arc-mid) 55%, var(--card-line)); }
+  .bubble.blaze::before{ animation: arc-run 2.4s cubic-bezier(.42, 0, .58, 1) both; }
+  .bubble.blaze::after{ animation: arc-halo 2.4s ease-in-out both; }
+  @keyframes arc-run{
+    0%{ opacity: 0; transform: rotate(-20deg); }
+    14%{ opacity: 1; }
+    76%{ opacity: 1; }
+    100%{ opacity: 0; transform: rotate(380deg); }
+  }
+  @keyframes arc-halo{
+    0%{ opacity: 0; }
+    30%{ opacity: 0.9; }
+    70%{ opacity: 0.65; }
+    100%{ opacity: 0; }
+  }
   @media (prefers-reduced-motion: reduce){
     .art img{ transition: none; }
     .bubble{ animation: none; }
+    .bubble::before, .bubble::after{ display: none; }
   }
 
-  @media (max-width: 940px){
+  /* six bubbles need a wide gutter to ring the portrait without crowding his
+     face, so the stacked pill layout takes over earlier than the art alone would
+     need */
+  @media (max-width: 1240px){
     .masthead{
       grid-template-columns: minmax(0, 1fr);
       padding-top: 40px;
@@ -313,7 +386,9 @@
       margin-inline: auto;
     }
     .masthead .words{ grid-column: 1; }
-    .masthead .art-wrap{ grid-column: 1; margin-left: 0; margin-right: 0; }
+    /* the gutter-overhang width belongs to the wide layout only; keeping it here
+       pushes the art (and the pill row) past the right edge of the screen */
+    .masthead .art-wrap{ grid-column: 1; width: 100%; margin-left: 0; margin-right: 0; }
     /* stacked, the art must return to normal flow or the bubble list,
        being the only in-flow child, floats up over his face */
     .art-wrap{ grid-row: 1; aspect-ratio: auto; margin: 0; }
@@ -344,42 +419,79 @@
   /* ---------------- the agentbox card: hero and navigation in one ------------- */
 
   .card-seat{
-    margin-top: 36px;
+    margin-top: 44px;
     container-type: inline-size;
   }
   .agentbox-card{
+    position: relative;
     background: var(--card);
     border: 1px solid var(--card-line);
-    border-radius: 10px;
-    box-shadow: 0 1px 2px rgba(18,18,22,0.05), 0 10px 28px rgba(18,18,22,0.09);
-    max-width: 27em;
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(18,18,22,0.05), 0 18px 44px rgba(18,18,22,0.13);
     overflow: hidden;
     animation: arrive 0.45s cubic-bezier(0.2, 0.8, 0.3, 1) 0.15s both;
+
+    /* the same three-colour rule that sits under the name, as the card's top edge */
+    &::before{
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 3px;
+      background: linear-gradient(to right,
+        var(--agentbox) 0 33.4%,
+        var(--snapper) 33.4% 66.7%,
+        var(--grabbit) 66.7% 100%);
+    }
 
     & .bar{
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 9px 14px;
+      gap: 9px;
+      padding: 11px 16px 10px;
       border-bottom: 1px solid var(--line);
       font-family: var(--mono);
       font-size: 0.75rem;
       color: var(--muted);
     }
+    & .app-name{ color: var(--ink); }
+    & .bar-meta{ margin-left: auto; letter-spacing: 0.04em; }
     & .title{
-      padding: 14px 18px 4px;
+      padding: 18px 20px 2px;
       margin: 0;
+      font-size: 1.3rem;
       font-weight: 700;
     }
     & ol{
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
       list-style: none;
       margin: 0;
-      padding: 8px 8px 10px;
+      padding: 16px 14px;
     }
-    & li + li{ margin-top: 2px; }
 
     /* spotlight: hovering one option quiets the others */
-    & ol:has(.opt:hover) .opt:not(:hover){ opacity: 0.55; }
+    & ol:has(.opt:hover) .opt:not(:hover){ opacity: 0.5; }
+
+    & .strip{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 16px;
+      border-top: 1px solid var(--line);
+      background: color-mix(in srgb, var(--ink) 3%, transparent);
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    & .strip .esc{ margin-left: auto; }
+  }
+  /* stacked, the options read as a list again */
+  @container (max-width: 46em){
+    .agentbox-card ol{ grid-template-columns: 1fr; }
+    .opt{ grid-template-columns: auto 1fr; align-items: baseline; }
+    .opt .head{ grid-row: span 3; align-self: center; }
+    .opt .stack{ grid-column: 2; }
   }
   @keyframes arrive{
     from{ opacity: 0; transform: translateY(14px) scale(0.98); }
@@ -406,45 +518,82 @@
     10%{ transform: scale(3.4); opacity: 0; }
     100%{ transform: scale(3.4); opacity: 0; }
   }
+  /* each option carries its project's colour, so the card is also the legend
+     for the three sections below it */
+  .o-agentbox{ --accent: var(--agentbox); --accent-soft: var(--agentbox-soft); }
+  .o-snapper{ --accent: var(--snapper); --accent-soft: var(--snapper-soft); }
+  .o-grabbit{ --accent: var(--grabbit); --accent-soft: var(--grabbit-soft); }
+
   .opt{
-    display: flex;
-    align-items: baseline;
-    gap: 11px;
-    padding: 8px 10px;
-    border-radius: 6px;
+    display: grid;
+    align-content: start;
+    gap: 5px;
+    height: 100%;
+    padding: 14px 15px 15px;
+    border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+    border-radius: 9px;
+    background: color-mix(in srgb, var(--accent) 5%, transparent);
     text-decoration: none;
-    transition: opacity 0.15s ease;
+    transition: opacity .15s ease, background .18s ease, border-color .18s ease,
+                transform .18s ease, box-shadow .18s ease;
 
-    &:hover, &.pressed{ background: var(--agentbox-soft); }
+    &:hover, &.pressed{
+      background: var(--accent-soft);
+      border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px color-mix(in srgb, var(--accent) 20%, transparent);
+    }
+    &:focus-visible{ outline: 2px solid var(--accent); outline-offset: 2px; }
 
+    & .head{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 3px;
+    }
     & .key{
       font-family: var(--mono);
       font-size: 0.75rem;
-      color: var(--agentbox);
+      color: var(--accent);
       border: 1px solid var(--card-line);
       border-bottom-width: 2px;
       border-radius: 4px;
       padding: 1px 7px;
+      transition: background .18s ease, color .18s ease, border-color .18s ease;
     }
-    &.pressed .key{ background: var(--agentbox); border-color: var(--agentbox); color: var(--card); }
+    &:hover .key, &.pressed .key{
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--card);
+    }
 
-    & .glyph{ color: var(--muted); align-self: center; flex: none; }
-    &:hover .glyph{ color: var(--ink); }
+    & .glyph{
+      width: 1.4em;
+      height: 1.4em;
+      color: var(--accent);
+      margin-left: auto;
+      opacity: 0.8;
+      flex: none;
+    }
+    &:hover .glyph{ opacity: 1; }
 
-    & .what{ color: var(--muted); font-size: 0.9375rem; }
+    & .nm{ font-size: 1.15rem; font-weight: 700; line-height: 1.15; }
+    & .what{ color: var(--muted); font-size: 0.9375rem; text-wrap: pretty; }
+    & .stack{
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.03em;
+      color: var(--muted);
+      margin-top: 4px;
+      opacity: 0.85;
+    }
   }
-  @container (max-width: 24em){
-    .opt .what{ display: none; }
-  }
-  .card-note{
-    margin: 14px 0 0;
-    font-size: 0.875rem;
-    color: var(--muted);
-
-    & .kbd-hint{ font-family: var(--mono); font-size: 0.8125rem; }
+  @media (prefers-reduced-motion: reduce){
+    .opt{ transition: opacity .15s ease; }
+    .opt:hover, .opt.pressed{ transform: none; }
   }
   @media (max-width: 640px), (pointer: coarse){
-    .card-note .kbd-hint{ display: none; }
+    .agentbox-card .strip .keys{ display: none; }
   }
 
   /* ---------------- sections ---------------- */
@@ -787,9 +936,10 @@
     list-style: none;
 
     & a{
+      --accent: var(--agentbox);
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 9px;
       font-family: var(--mono);
       font-size: 0.8125rem;
       text-decoration: none;
@@ -798,13 +948,21 @@
       border: 1px solid var(--card-line);
       border-bottom-width: 2px;
       border-radius: 7px;
-      padding: 9px 14px;
-      transition: border-color .15s ease, transform .15s ease;
+      padding: 10px 15px;
+      transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease;
 
-      &:hover{ border-color: var(--agentbox); transform: translateY(-1px); }
-      &:focus-visible{ outline: 2px solid var(--agentbox); outline-offset: 2px; }
+      &:hover{
+        border-color: var(--accent);
+        transform: translateY(-1px);
+        box-shadow: 0 5px 14px color-mix(in srgb, var(--accent) 18%, transparent);
+      }
+      &:focus-visible{ outline: 2px solid var(--accent); outline-offset: 2px; }
     }
+    & .brand, & .glyph{ color: var(--muted); transition: color .15s ease; }
+    & a:hover .brand, & a:hover .glyph{ color: var(--accent); }
   }
+  .ways .w-github{ --accent: var(--ink); }
+  .ways .w-gitlab{ --accent: #ef6427; }
   @media (prefers-reduced-motion: reduce){
     .ways a{ transition: none; }
     .ways a:hover{ transform: none; }
@@ -813,24 +971,13 @@
   /* ---------------- footer ---------------- */
 
   footer{
-    margin-top: 76px;
-    padding-top: 28px;
-    padding-bottom: 56px;
+    margin-top: 72px;
+    padding-top: 22px;
+    padding-bottom: 44px;
     border-top: 1px solid var(--line);
-
-    & .links{
-      font-family: var(--mono);
-      font-size: 0.8125rem;
-      margin: 0;
-
-      & a{ color: var(--muted);
-        &:hover{ color: var(--ink); }
-      }
-      & span{ color: var(--card-line); margin: 0 6px; }
-    }
   }
   .colophon{
-    margin: 14px 0 0;
+    margin: 0;
     font-size: 0.8125rem;
     color: var(--muted);
 
@@ -859,8 +1006,11 @@
     <rect x="3" y="5.2" width="18" height="13.6" rx="2.4"/>
     <path d="m3.8 6.6 8.2 6 8.2-6"/>
   </symbol>
-  <symbol id="i-code" viewBox="0 0 24 24">
-    <path d="m8.6 8.4-4.4 3.6 4.4 3.6M15.4 8.4l4.4 3.6-4.4 3.6M13.4 5.2l-2.8 13.6"/>
+  <symbol id="i-github" viewBox="0 0 24 24">
+    <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+  </symbol>
+  <symbol id="i-gitlab" viewBox="0 0 24 24">
+    <path d="m23.6004 9.5927-.0337-.0862L20.3.9814a.851.851 0 0 0-.3362-.405.8748.8748 0 0 0-.9997.0539.8748.8748 0 0 0-.29.4399l-2.2055 6.748H7.5375l-2.2057-6.748a.8573.8573 0 0 0-.29-.4412.8748.8748 0 0 0-.9997-.0537.8585.8585 0 0 0-.3362.4049L.4332 9.5015l-.0325.0862a6.0657 6.0657 0 0 0 2.0119 7.0105l.0113.0087.03.0213 4.976 3.7264 2.462 1.8633 1.4995 1.1321a1.0085 1.0085 0 0 0 1.2197 0l1.4995-1.1321 2.4619-1.8633 5.006-3.7489.0125-.01a6.0682 6.0682 0 0 0 2.0094-7.003z"/>
   </symbol>
 </svg>
 
@@ -888,34 +1038,50 @@
       <img src="boris.webp" width="1024" height="768" loading="eager"
            alt="Cartoon of Boris mid-leap hugging an oversized keyboard, trailing floppy disks and an old beige tower, with world landmarks and streams of binary behind him.">
     </div>
-    <ul class="bubbles" aria-label="Where I have worked and studied">
+    <ul class="bubbles" aria-label="Where I have worked, served and studied">
       <li class="bubble"><b>Intel</b><span class="kind">silicon</span></li>
       <li class="bubble"><b>Rafael</b><span class="kind">defense</span></li>
       <li class="bubble"><b>Nano-<br>Dimension</b><span class="kind">AI core</span></li>
       <li class="bubble"><b>Minimus</b><span class="kind">containers</span></li>
       <li class="bubble"><b>Technion</b><span class="kind">B.Sc.</span></li>
+      <li class="bubble"><b>8200</b><span class="kind">military</span></li>
     </ul>
   </div>
 </header>
 
-<div class="card-seat col">
+<div class="card-seat wide">
   <nav class="agentbox-card" aria-label="Projects">
-    <div class="bar"><span class="app-dot" aria-hidden="true"></span>agentbox</div>
+    <div class="bar">
+      <span class="app-dot" aria-hidden="true"></span>
+      <span class="app-name">AgentBox</span>
+      <span class="bar-meta">local &middot; no account</span>
+    </div>
     <p class="title">Where do you want to start?</p>
     <ol>
-      <li><a class="opt" href="#agentbox" data-key="1">
-        <span class="key">1</span><svg class="glyph" aria-hidden="true"><use href="#i-agentbox"/></svg><span>AgentBox</span><span class="what">this card, actually</span>
+      <li><a class="opt o-agentbox" href="#agentbox" data-key="1">
+        <span class="head"><span class="key">1</span><svg class="glyph" aria-hidden="true"><use href="#i-agentbox"/></svg></span>
+        <span class="nm">AgentBox</span>
+        <span class="what">This card, actually. Agents ask, you answer in one keystroke.</span>
+        <span class="stack">Go &middot; Linux/X11 &middot; MCP</span>
       </a></li>
-      <li><a class="opt" href="#snapper" data-key="2">
-        <span class="key">2</span><svg class="glyph" aria-hidden="true"><use href="#i-snapper"/></svg><span>snapper</span><span class="what">the screenshot editor</span>
+      <li><a class="opt o-snapper" href="#snapper" data-key="2">
+        <span class="head"><span class="key">2</span><svg class="glyph" aria-hidden="true"><use href="#i-snapper"/></svg></span>
+        <span class="nm">Snapper</span>
+        <span class="what">Screenshots you can still take apart and edit next week.</span>
+        <span class="stack">Go &middot; Gio &middot; OCR</span>
       </a></li>
-      <li><a class="opt" href="#grabbit" data-key="3">
-        <span class="key">3</span><svg class="glyph" aria-hidden="true"><use href="#i-grabbit"/></svg><span>grabbit</span><span class="what">the download manager</span>
+      <li><a class="opt o-grabbit" href="#grabbit" data-key="3">
+        <span class="head"><span class="key">3</span><svg class="glyph" aria-hidden="true"><use href="#i-grabbit"/></svg></span>
+        <span class="nm">Grabbit</span>
+        <span class="what">Downloads that wait out the hoster timer without you.</span>
+        <span class="stack">Go &middot; Wails &middot; Svelte</span>
       </a></li>
     </ol>
+    <div class="strip">
+      <span>A real AgentBox card, and the first tool below.</span>
+      <span class="keys esc">press 1 &middot; 2 &middot; 3</span>
+    </div>
   </nav>
-  <p class="card-note">That is a real AgentBox card, the first tool below.
-    <span class="kbd-hint">The numbers work here too: press 1, 2 or 3.</span></p>
 </div>
 
 <main>
@@ -958,17 +1124,17 @@ agentbox notify --level success --title <span class="str">"release is live"</spa
   </section>
 
   <section id="snapper" class="col">
-    <h2 tabindex="-1"><svg class="glyph" aria-hidden="true"><use href="#i-snapper"/></svg>snapper</h2>
+    <h2 tabindex="-1"><svg class="glyph" aria-hidden="true"><use href="#i-snapper"/></svg>Snapper</h2>
     <p class="role">screenshot capture and annotation &middot; Go, Gio</p>
     <p>
-      snapper starts from Flameshot's in-overlay speed and Snagit's magnifier
+      Snapper starts from Flameshot's in-overlay speed and Snagit's magnifier
       precision, then adds the editor I always wanted: one where nothing ever
       flattens. Every arrow, label and redaction stays a separate object you can
       reselect, restyle or move next week. A scene saves as a
       <span class="mono">.snap</span> project, not a baked PNG.
     </p>
     <figure>
-      <div class="capture" role="img" aria-label="Mock of the snapper editor: a captured settings window with a selected arrow annotation and a label pill">
+      <div class="capture" role="img" aria-label="Mock of the Snapper editor: a captured settings window with a selected arrow annotation and a label pill">
         <div class="fake-win" aria-hidden="true">
           <div class="win-bar">settings.png</div>
           <div class="win-body">
@@ -1001,11 +1167,11 @@ agentbox notify --level success --title <span class="str">"release is live"</spa
   </section>
 
   <section id="grabbit" class="col">
-    <h2 tabindex="-1"><svg class="glyph" aria-hidden="true"><use href="#i-grabbit"/></svg>grabbit</h2>
+    <h2 tabindex="-1"><svg class="glyph" aria-hidden="true"><use href="#i-grabbit"/></svg>Grabbit</h2>
     <p class="role">download manager &middot; Go, Wails, Svelte</p>
     <p>
       A download manager for Linux, built because I loved what JDownloader
-      did and wanted it lean, native and scriptable. Copy a link and grabbit
+      did and wanted it lean, native and scriptable. Copy a link and Grabbit
       takes it from there: several connections per file, clean resume after
       a crash or a reboot, multi-part archives grouped into one package.
     </p>
@@ -1017,7 +1183,7 @@ agentbox notify --level success --title <span class="str">"release is live"</spa
       seconds only a human can do; it does the rest.
     </p>
     <figure>
-      <div class="queue" role="img" aria-label="Mock of the grabbit queue: one package downloading over six connections, one download waiting out a hoster timer">
+      <div class="queue" role="img" aria-label="Mock of the Grabbit queue: one package downloading over six connections, one download waiting out a hoster timer">
         <div class="dl active">
           <div class="top">
             <span class="name">fedora-workstation.part01.rar &nbsp;+2</span>
@@ -1082,19 +1248,14 @@ agentbox notify --level success --title <span class="str">"release is live"</spa
     <p>Anything else, write to me.</p>
     <ul class="ways">
       <li><a href="mailto:boris.milner@gmail.com"><svg class="glyph" aria-hidden="true"><use href="#i-mail"/></svg>boris.milner@gmail.com</a></li>
-      <li><a href="https://github.com/borismilner"><svg class="glyph" aria-hidden="true"><use href="#i-code"/></svg>GitHub</a></li>
-      <li><a href="https://gitlab.com/fu-bar/from-github"><svg class="glyph" aria-hidden="true"><use href="#i-code"/></svg>GitLab</a></li>
+      <li><a class="w-github" href="https://github.com/borismilner"><svg class="glyph brand" aria-hidden="true"><use href="#i-github"/></svg>GitHub</a></li>
+      <li><a class="w-gitlab" href="https://gitlab.com/fu-bar/from-github"><svg class="glyph brand" aria-hidden="true"><use href="#i-gitlab"/></svg>GitLab</a></li>
     </ul>
   </section>
 </main>
 
 <footer>
   <div class="col">
-    <p class="links">
-      <a href="mailto:boris.milner@gmail.com">boris.milner@gmail.com</a><span>&middot;</span>
-      <a href="https://github.com/borismilner">GitHub</a><span>&middot;</span>
-      <a href="https://gitlab.com/fu-bar/from-github">GitLab</a>
-    </p>
     <p class="colophon">No build step, no frameworks, set in Charter.
       <a href="https://github.com/borismilner/borismilner.github.io">View source</a>.</p>
   </div>
@@ -1114,6 +1275,29 @@ agentbox notify --level success --title <span class="str">"release is live"</spa
     target.querySelector("h2").focus({ preventScroll: true });
     history.replaceState(null, "", opt.getAttribute("href"));
   });
+
+  /* one bubble at a time gets a light run around its rim. the gaps are long and
+     uneven on purpose: it should catch the eye once, not perform. */
+  (function () {
+    var bubbles = Array.prototype.slice.call(document.querySelectorAll(".bubble"));
+    if (!bubbles.length) return;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var last = -1;
+
+    function schedule(delay) {
+      setTimeout(function () {
+        if (document.hidden) { schedule(9000); return; }
+        var i;
+        do { i = Math.floor(Math.random() * bubbles.length); } while (bubbles.length > 1 && i === last);
+        last = i;
+        var el = bubbles[i];
+        el.classList.add("blaze");
+        setTimeout(function () { el.classList.remove("blaze"); }, 2500);
+        schedule(13000 + Math.random() * 17000);
+      }, delay);
+    }
+    schedule(5000 + Math.random() * 5000);
+  })();
 
   /* the grabbit queue is a tiny piece of theater: the hoster countdown
      really ticks, and when it reaches zero the download starts */
