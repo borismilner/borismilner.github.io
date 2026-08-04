@@ -92,12 +92,43 @@
 
   *, *::before, *::after{ box-sizing: border-box; }
 
+  /* the type scale is fluid and every measure on the page is in em, so the
+     reading column widens with the screen while the line stays the same length
+     in characters. the rem term keeps a reader's own font size in charge. */
   html{
+    font-size: clamp(1rem, 0.95rem + 0.4vw, 1.2rem);
     scroll-behavior: smooth;
     scrollbar-color: var(--card-line) transparent;
   }
   @media (prefers-reduced-motion: reduce){
     html{ scroll-behavior: auto; }
+  }
+
+  /* reading progress, driven by the document scroll: no scroll listener, no
+     layout reads, and it cannot fall out of step with the page */
+  .rail{ display: none; }
+  @supports (animation-timeline: scroll(root)){
+    @media (prefers-reduced-motion: no-preference){
+      .rail{
+        display: block;
+        position: fixed;
+        inset: 0 0 auto;
+        height: 3px;
+        z-index: 5;
+        transform-origin: 0 50%;
+        scale: 0 1;
+        background: linear-gradient(to right,
+          var(--agentbox) 0 33.4%,
+          var(--snapper) 33.4% 66.7%,
+          var(--grabbit) 66.7% 100%);
+        animation: rail-fill linear both;
+        animation-timeline: scroll(root);
+      }
+    }
+  }
+  @keyframes rail-fill{
+    from{ scale: 0 1; }
+    to{ scale: 1 1; }
   }
 
   body{
@@ -155,7 +186,7 @@
   }
   /* wider shell, for the things that should breathe */
   .wide{
-    max-width: 58em;
+    max-width: 62em;
     margin-inline: auto;
     padding-inline: 24px;
   }
@@ -191,31 +222,23 @@
 
   /* ---------------- masthead ---------------- */
 
-  /* three tracks: the middle one is exactly .col, so the masthead text lands on
-     the same left edge as every section below it. the art lives in the right
-     gutter, which is otherwise dead space on a wide screen. */
+  /* words and portrait split one shell, the same shell the card below uses, so
+     the top of the page reads as a single block with two shared edges rather
+     than a column marooned in the middle of the screen */
   .masthead{
     display: grid;
-    grid-template-columns: 1fr min(41em, 100%) 1fr;
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+    gap: clamp(18px, 2.4vw, 44px);
     align-items: center;
-    max-width: 84em;
+    max-width: 62em;
     margin-inline: auto;
-    padding: 64px 0 0;
+    padding: clamp(34px, 4vw, 62px) 24px 0;
   }
-  .masthead .words{
-    grid-column: 2;
-    padding-inline: 24px;
-  }
-  .masthead .art-wrap{
-    grid-column: 3;
-    justify-self: start;
-    width: min(100% + 4.5em - 24px, 30em);
-    margin-left: -4.5em;
-    margin-right: 24px;
-  }
+  .masthead .words{ grid-column: 1; }
+  .masthead .art-wrap{ grid-column: 2; }
 
   .masthead h1{
-    font-size: clamp(2.2rem, 1.4rem + 2.6vw, 3.1rem);
+    font-size: clamp(2.2rem, 1.5rem + 2.4vw, 3.4rem);
     font-weight: 700;
     line-height: 1.08;
     letter-spacing: 0.005em;
@@ -241,9 +264,11 @@
     color: var(--muted);
     margin: 13px 0 0;
   }
+  /* the headline may run the whole column; the prose keeps a readable line */
   .lede{
     margin: 26px 0 0;
-    font-size: 1.125rem;
+    max-width: 32em;
+    font-size: 1.0625rem;
     text-wrap: pretty;
   }
   .lede + .lede{ margin-top: 16px; }
@@ -282,11 +307,11 @@
   }
 
   /* places I have worked, drifting around him */
-  /* the art deliberately reaches 48px back under the prose column; the bubble
-     field starts just clear of that, so no bubble ever lands on a line of text */
+  /* the field is the art's own box now that the portrait has a column of its
+     own, so the ring can use both edges */
   .bubbles{
     position: absolute;
-    inset: -8% 0 -6% 54px;
+    inset: -9% -2% -7%;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -299,8 +324,8 @@
     align-items: center;
     justify-content: center;
     gap: 3px;
-    width: clamp(4.5rem, 26cqw, 5.9rem);
-    height: clamp(4.5rem, 26cqw, 5.9rem);
+    width: clamp(4.2rem, 23cqw, 5.6rem);
+    height: clamp(4.2rem, 23cqw, 5.6rem);
     border-radius: 50%;
     background: color-mix(in srgb, var(--card) 88%, transparent);
     border: 1px solid var(--card-line);
@@ -364,13 +389,15 @@
     filter: blur(8px);
   }
   .bubble.blaze{ border-color: color-mix(in srgb, var(--arc-mid) 55%, var(--card-line)); }
-  .bubble.blaze::before{ animation: arc-run 2.4s cubic-bezier(.42, 0, .58, 1) both; }
-  .bubble.blaze::after{ animation: arc-halo 2.4s ease-in-out both; }
+  .bubble.blaze::before{ animation: arc-run var(--arc-time, 2.2s) cubic-bezier(.42, 0, .58, 1) both; }
+  .bubble.blaze::after{ animation: arc-halo var(--arc-time, 2.2s) ease-in-out both; }
+  /* the two custom properties are set per run, so no two runs start at the same
+     point of the rim or travel the same way round */
   @keyframes arc-run{
-    0%{ opacity: 0; transform: rotate(-20deg); }
+    0%{ opacity: 0; transform: rotate(var(--arc-from, 0deg)); }
     14%{ opacity: 1; }
     76%{ opacity: 1; }
-    100%{ opacity: 0; transform: rotate(380deg); }
+    100%{ opacity: 0; transform: rotate(calc(var(--arc-from, 0deg) + var(--arc-turn, 380deg))); }
   }
   @keyframes arc-halo{
     0%{ opacity: 0; }
@@ -384,20 +411,23 @@
     .bubble::before, .bubble::after{ display: none; }
   }
 
-  /* six bubbles need a wide gutter to ring the portrait without crowding his
-     face, so the stacked pill layout takes over earlier than the art alone would
-     need */
-  @media (max-width: 1240px){
+  /* below this the art column is too narrow for six bubbles to ring a face, so
+     they become a row of pills under the portrait and the hero stacks */
+  @media (max-width: 68em){
+    /* stacked, the hero uses the article's own column, so the name lines up with
+       every heading below it */
     .masthead{
       grid-template-columns: minmax(0, 1fr);
       padding-top: 40px;
-      max-width: 44em;
+      max-width: 41em;
       margin-inline: auto;
     }
     .masthead .words{ grid-column: 1; }
-    /* the gutter-overhang width belongs to the wide layout only; keeping it here
-       pushes the art (and the pill row) past the right edge of the screen */
-    .masthead .art-wrap{ grid-column: 1; width: 100%; margin-left: 0; margin-right: 0; }
+    .masthead .art-wrap{ grid-column: 1; width: 100%; }
+    .lede{ max-width: none; }
+    /* and the portrait stops being a banner: it keeps a portrait's proportions
+       and sits centred over the pills */
+    .art{ width: min(100%, 27em); margin-inline: auto; }
     /* stacked, the art must return to normal flow or the bubble list,
        being the only in-flow child, floats up over his face */
     .art-wrap{ grid-row: 1; aspect-ratio: auto; margin: 0; }
@@ -607,15 +637,51 @@
 
   /* ---------------- sections ---------------- */
 
-  section{ padding-top: 68px; }
+  section{
+    padding-top: 68px;
+    scroll-margin-top: 18px;
+  }
   h2{
-    font-size: 1.55rem;
+    font-size: clamp(1.5rem, 1.35rem + 0.5vw, 1.9rem);
     font-weight: 700;
     line-height: 1.2;
     margin: 0 0 4px;
+    width: fit-content;
 
     &:focus{ outline: none; }
     & .glyph{ margin-right: 9px; stroke-width: 2; }
+  }
+
+  /* trims the font's built-in leading so a heading sits optically flush with
+     the rule under it, instead of floating on invisible space */
+  @supports (text-box: trim-both cap alphabetic){
+    h1, h2{ text-box: trim-both cap alphabetic; }
+  }
+
+  /* jumping from the card should be visible, not silent: the section you land on
+     says so in its own colour and then lets go */
+  section:target h2{
+    animation: landed 1.5s ease-out both;
+  }
+  @keyframes landed{
+    0%{ background-size: 100% 100%; }
+    100%{ background-size: 100% 0%; }
+  }
+  section:target h2{
+    background-image: linear-gradient(color-mix(in srgb, var(--accent, var(--agentbox)) 20%, transparent) 0 0);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    border-radius: 4px;
+    /* the wash bleeds a little past the glyph and the last letter without
+       moving the heading off the column's left edge */
+    padding-inline: 0.3em;
+    margin-inline: -0.3em;
+  }
+  #agentbox{ --accent: var(--agentbox); }
+  #snapper{ --accent: var(--snapper); }
+  #grabbit{ --accent: var(--grabbit); }
+  @media (prefers-reduced-motion: reduce){
+    section:target h2{ animation: none; background-image: none; }
   }
   #agentbox h2 .glyph{ color: var(--agentbox); }
   #snapper h2 .glyph{ color: var(--snapper); }
@@ -661,7 +727,7 @@
   }
   @media (min-width: 700px){
     .with-mascot{
-      grid-template-columns: minmax(0, 1fr) 11rem;
+      grid-template-columns: minmax(0, 1fr) 10rem;
       align-items: start;
       width: calc(100% + var(--bleed));
       margin-bottom: 8px;
@@ -670,7 +736,7 @@
   }
   .mascot{
     width: 100%;
-    max-width: 11rem;
+    max-width: 10rem;
     height: auto;
     justify-self: center;
     border: 1px solid var(--card-line);
@@ -679,7 +745,12 @@
     transform: rotate(-1.25deg);
   }
 
+  /* the card is the size of the longest line, not the size of the figure: a
+     code block padded out with empty space reads as a mistake */
   pre{
+    width: fit-content;
+    max-width: 100%;
+    margin-inline: auto;
     background: var(--card);
     border: 1px solid var(--card-line);
     border-radius: 10px;
@@ -688,7 +759,7 @@
     font-family: var(--mono);
     font-size: 0.8125rem;
     line-height: 1.55;
-    margin: 0;
+    margin-block: 0;
 
     & .cm{ color: var(--muted); }
     & .kw{ color: var(--agentbox); }
@@ -699,6 +770,8 @@
 
   .capture{
     position: relative;
+    max-width: 46rem;
+    margin-inline: auto;
     border: 1px solid var(--card-line);
     border-radius: 10px;
     background: var(--card);
@@ -946,11 +1019,26 @@
       padding: 11px 0;
       border-bottom: 1px solid var(--line);
     }
+    /* each row arrives on its own as it scrolls in: the stagger is the scroll
+       position, not a delay, so it reverses when you scroll back up */
+    @supports (animation-timeline: view()){
+      @media (prefers-reduced-motion: no-preference){
+        & li{
+          animation: row-in linear both;
+          animation-timeline: view();
+          animation-range: entry 10% entry 60%;
+        }
+      }
+    }
     & .desc{
       color: var(--muted);
       font-size: 0.9375rem;
       text-align: right;
     }
+  }
+  @keyframes row-in{
+    from{ opacity: 0; transform: translateY(10px); }
+    to{ opacity: 1; transform: none; }
   }
   @media (max-width: 560px){
     .archive li{ flex-direction: column; gap: 2px; }
@@ -1018,6 +1106,8 @@
 </style>
 </head>
 <body>
+
+<div class="rail" aria-hidden="true"></div>
 
 <svg style="display:none" aria-hidden="true">
   <symbol id="i-agentbox" viewBox="0 0 24 24">
@@ -1306,34 +1396,44 @@ agentbox notify --level success --title <span class="str">"release is live"</spa
     if (!opt) return;
     opt.classList.add("pressed");
     setTimeout(function () { opt.classList.remove("pressed"); }, 400);
-    var target = document.querySelector(opt.getAttribute("href"));
-    var instant = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    target.scrollIntoView({ behavior: instant ? "auto" : "smooth" });
-    target.querySelector("h2").focus({ preventScroll: true });
-    history.replaceState(null, "", opt.getAttribute("href"));
+    /* setting the hash rather than scrolling by hand: the browser does the
+       smooth scroll, honours scroll-margin, and :target lights the section */
+    location.hash = opt.getAttribute("href");
+    document.querySelector(opt.getAttribute("href")).querySelector("h2")
+      .focus({ preventScroll: true });
   });
 
-  /* one bubble at a time gets a light run around its rim. the gaps are long and
-     uneven on purpose: it should catch the eye once, not perform. */
+  /* one bubble at a time gets a light run around its rim: a different bubble
+     each time, entering at a different point of the rim, sometimes the other way
+     round, so it never looks like a loop playing back. */
   (function () {
     var bubbles = Array.prototype.slice.call(document.querySelectorAll(".bubble"));
     if (!bubbles.length) return;
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     var last = -1;
 
+    function run() {
+      var i;
+      do { i = Math.floor(Math.random() * bubbles.length); } while (bubbles.length > 1 && i === last);
+      last = i;
+
+      var el = bubbles[i];
+      var seconds = 1.9 + Math.random() * 0.9;
+      el.style.setProperty("--arc-from", Math.round(Math.random() * 360) + "deg");
+      el.style.setProperty("--arc-turn", (Math.random() < 0.5 ? -1 : 1) * (340 + Math.round(Math.random() * 90)) + "deg");
+      el.style.setProperty("--arc-time", seconds.toFixed(2) + "s");
+      el.classList.add("blaze");
+      setTimeout(function () { el.classList.remove("blaze"); }, seconds * 1000 + 60);
+    }
+
     function schedule(delay) {
       setTimeout(function () {
-        if (document.hidden) { schedule(9000); return; }
-        var i;
-        do { i = Math.floor(Math.random() * bubbles.length); } while (bubbles.length > 1 && i === last);
-        last = i;
-        var el = bubbles[i];
-        el.classList.add("blaze");
-        setTimeout(function () { el.classList.remove("blaze"); }, 2500);
-        schedule(13000 + Math.random() * 17000);
+        if (document.hidden) { schedule(6000); return; }
+        run();
+        schedule(5500 + Math.random() * 6000);
       }, delay);
     }
-    schedule(5000 + Math.random() * 5000);
+    schedule(2500 + Math.random() * 3000);
   })();
 
   /* the grabbit queue is a tiny piece of theater: the hoster countdown
