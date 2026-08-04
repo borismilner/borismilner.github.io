@@ -4,15 +4,33 @@
 <meta charset="UTF-8">
 <title>Boris Milner</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Boris Milner builds tools for the Linux desktop: AgentBox (a way for AI agents to reach you), snapper (screenshots that never flatten), grabbit (downloads).">
+<meta name="author" content="Boris Milner">
+<meta name="description" content="Boris Milner, backend and infrastructure engineer in Tel Aviv. Fourteen years from silicon validation to reverse engineering to large-scale data platforms, now container image security. Builds Linux desktop tools: AgentBox, snapper, grabbit.">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fdfdfb">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#222429">
+<meta property="og:type" content="profile">
 <meta property="og:title" content="Boris Milner">
-<meta property="og:description" content="Tools for the Linux desktop: AgentBox, snapper, grabbit. Software should cost you seconds, not context switches.">
+<meta property="og:description" content="Backend and infrastructure engineer in Tel Aviv. Fourteen years, silicon to large-scale data platforms, now container image security. Linux desktop tools: AgentBox, snapper, grabbit.">
 <meta property="og:url" content="https://borismilner.github.io">
-<meta property="og:image" content="https://avatars.githubusercontent.com/u/821440?v=4">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://borismilner.github.io/card.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2326282c%22%2F%3E%3Ctext%20x%3D%2232%22%20y%3D%2243%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2230%22%20fill%3D%22%23fdfdfb%22%20text-anchor%3D%22middle%22%3Ebm%3C%2Ftext%3E%3C%2Fsvg%3E">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Boris Milner",
+  "jobTitle": "Backend and Infrastructure Engineer",
+  "url": "https://borismilner.github.io",
+  "email": "mailto:boris.milner@gmail.com",
+  "address": { "@type": "PostalAddress", "addressLocality": "Tel Aviv", "addressCountry": "IL" },
+  "alumniOf": { "@type": "CollegeOrUniversity", "name": "Technion - Israel Institute of Technology" },
+  "knowsAbout": ["Go", "Python", "Java", "Linux", "Containers", "Distributed systems", "Data pipelines"],
+  "sameAs": ["https://github.com/borismilner", "https://gitlab.com/fu-bar/from-github"]
+}
+</script>
 <style>
   :root{
     color-scheme: light dark;
@@ -30,6 +48,11 @@
     --serif: Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif;
     --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
     --weave-strength: 0.05;
+    --glow: 0.11;
+    /* the caricature is graded down to sit inside the palette instead of on top of it */
+    --art-filter: saturate(.40) contrast(1.05) brightness(1.03);
+    --art-opacity: .93;
+    --art-blend: multiply;
   }
   @media (prefers-color-scheme: dark){
     :root{
@@ -45,6 +68,10 @@
       --snapper: #57b98d;
       --snapper-soft: #263e33;
       --weave-strength: 0.07;
+      --glow: 0.15;
+      --art-filter: saturate(.46) contrast(1.04) brightness(.98);
+      --art-opacity: .96;
+      --art-blend: normal;
     }
   }
 
@@ -92,9 +119,9 @@
     z-index: -1;
     pointer-events: none;
     background:
-      radial-gradient(44rem 30rem at 84% -6%, color-mix(in srgb, var(--agentbox) 7%, transparent), transparent 68%),
-      radial-gradient(38rem 28rem at -14% 44%, color-mix(in srgb, var(--snapper) 6%, transparent), transparent 68%),
-      radial-gradient(32rem 26rem at 106% 90%, color-mix(in srgb, var(--grabbit) 6%, transparent), transparent 68%);
+      radial-gradient(44rem 30rem at 84% -6%, color-mix(in srgb, var(--agentbox) calc(var(--glow) * 100%), transparent), transparent 68%),
+      radial-gradient(38rem 28rem at -14% 44%, color-mix(in srgb, var(--snapper) calc(var(--glow) * 90%), transparent), transparent 68%),
+      radial-gradient(32rem 26rem at 106% 90%, color-mix(in srgb, var(--grabbit) calc(var(--glow) * 90%), transparent), transparent 68%);
     animation: sway 44s ease-in-out infinite alternate;
   }
   @keyframes sway{
@@ -108,6 +135,12 @@
 
   .col{
     max-width: 41em;
+    margin-inline: auto;
+    padding-inline: 24px;
+  }
+  /* wider shell, for the things that should breathe */
+  .wide{
+    max-width: 58em;
     margin-inline: auto;
     padding-inline: 24px;
   }
@@ -134,48 +167,184 @@
     vertical-align: -0.12em;
   }
 
-  /* masthead */
+  /* ---------------- masthead ---------------- */
+
+  /* three tracks: the middle one is exactly .col, so the masthead text lands on
+     the same left edge as every section below it. the art lives in the right
+     gutter, which is otherwise dead space on a wide screen. */
   .masthead{
-    padding-top: 76px;
-
-    & h1{
-      font-size: 2.1rem;
-      font-weight: 700;
-      line-height: 1.15;
-      letter-spacing: 0.01em;
-      margin: 0;
-      text-wrap: balance;
-
-      &::after{
-        content: "";
-        display: block;
-        width: 90px;
-        height: 4px;
-        margin-top: 14px;
-        border-radius: 2px;
-        background: linear-gradient(to right,
-          var(--agentbox) 0 33.4%,
-          var(--snapper) 33.4% 66.7%,
-          var(--grabbit) 66.7% 100%);
-      }
-    }
-    & .sub{
-      font-family: var(--mono);
-      font-size: 0.8125rem;
-      color: var(--muted);
-      margin: 12px 0 0;
-    }
+    display: grid;
+    grid-template-columns: 1fr min(41em, 100%) 1fr;
+    align-items: center;
+    max-width: 84em;
+    margin-inline: auto;
+    padding: 64px 0 0;
+  }
+  .masthead .words{
+    grid-column: 2;
+    padding-inline: 24px;
+  }
+  .masthead .art-wrap{
+    grid-column: 3;
+    justify-self: start;
+    width: min(100% + 4.5em - 24px, 30em);
+    margin-left: -4.5em;
+    margin-right: 24px;
   }
 
+  .masthead h1{
+    font-size: clamp(2.2rem, 1.4rem + 2.6vw, 3.1rem);
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: 0.005em;
+    margin: 0;
+    text-wrap: balance;
+
+    &::after{
+      content: "";
+      display: block;
+      width: 90px;
+      height: 4px;
+      margin-top: 16px;
+      border-radius: 2px;
+      background: linear-gradient(to right,
+        var(--agentbox) 0 33.4%,
+        var(--snapper) 33.4% 66.7%,
+        var(--grabbit) 66.7% 100%);
+    }
+  }
+  .masthead .sub{
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    color: var(--muted);
+    margin: 13px 0 0;
+  }
   .lede{
-    margin: 28px 0 0;
+    margin: 26px 0 0;
     font-size: 1.125rem;
     text-wrap: pretty;
   }
+  .lede + .lede{ margin-top: 16px; }
 
-  /* the agentbox card: hero and navigation in one */
+  /* the caricature, dissolved into the paper rather than framed on it.
+     the mask radii are deliberately <= the distance from the centre to the
+     nearest edge on each axis, so every edge reaches full transparency
+     inside the box. get this wrong and one side stops hard and reads square. */
+  .art-wrap{
+    position: relative;
+    aspect-ratio: 1024 / 768;
+  }
+  .art{
+    position: absolute;
+    inset: 0;
+
+    & img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 54% 40%;
+      display: block;
+      filter: var(--art-filter);
+      opacity: var(--art-opacity);
+      mix-blend-mode: var(--art-blend);
+      -webkit-mask-image: radial-gradient(48% 46% at 52% 46%, #000 0 42%, transparent 100%);
+      mask-image: radial-gradient(48% 46% at 52% 46%, #000 0 42%, transparent 100%);
+      transition: filter .5s ease, opacity .5s ease;
+    }
+    /* full colour is the reward for reaching for it, never the default */
+    &:hover img, &:focus-within img{
+      filter: saturate(1) contrast(1) brightness(1);
+      opacity: 1;
+    }
+  }
+
+  /* places I have worked, drifting around him */
+  .bubbles{
+    position: absolute;
+    inset: -7% 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    pointer-events: none;
+  }
+  .bubble{
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    width: 5.9rem;
+    height: 5.9rem;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--card) 88%, transparent);
+    border: 1px solid var(--card-line);
+    box-shadow: 0 2px 10px rgba(18,18,22,0.07);
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    line-height: 1.25;
+    letter-spacing: 0.02em;
+    text-align: center;
+    color: var(--muted);
+    padding: 4px;
+    text-wrap: balance;
+    animation: bob 7s ease-in-out infinite alternate;
+  }
+  .bubble b{ color: var(--ink); font-weight: 400; display: block; }
+  .bubble:nth-child(1){ top: 1%;  right: 4%;  animation-duration: 6.5s; }
+  .bubble:nth-child(2){ top: 27%; right: 0;   animation-duration: 8.5s; animation-delay: -2s; }
+  .bubble:nth-child(3){ bottom: 21%; right: 3%; animation-duration: 7.5s; animation-delay: -4s; }
+  .bubble:nth-child(4){ bottom: 1%; left: 34%; animation-duration: 9s;   animation-delay: -1s; }
+  .bubble:nth-child(5){ top: 9%;  left: 6%;   animation-duration: 8s;   animation-delay: -3s; }
+  @keyframes bob{
+    from{ transform: translateY(-7px); }
+    to{ transform: translateY(7px); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .art img{ transition: none; }
+    .bubble{ animation: none; }
+  }
+
+  @media (max-width: 940px){
+    .masthead{
+      grid-template-columns: minmax(0, 1fr);
+      padding-top: 40px;
+      max-width: 44em;
+      margin-inline: auto;
+    }
+    .masthead .words{ grid-column: 1; }
+    .masthead .art-wrap{ grid-column: 1; margin-left: 0; margin-right: 0; }
+    /* stacked, the art must return to normal flow or the bubble list,
+       being the only in-flow child, floats up over his face */
+    .art-wrap{ grid-row: 1; aspect-ratio: auto; margin: 0; }
+    .art{ position: static; }
+    .art img{ height: auto; max-height: 44vh; }
+    .bubbles{
+      position: static;
+      inset: auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 7px;
+      margin: 2px 0 0;
+    }
+    .bubble{
+      position: static;
+      flex-direction: row;
+      gap: 7px;
+      width: auto; height: auto;
+      border-radius: 100px;
+      padding: 5px 12px;
+      animation: none;
+    }
+    .bubble b{ display: inline; }
+    .bubble br{ display: none; }
+  }
+
+  /* ---------------- the agentbox card: hero and navigation in one ------------- */
+
   .card-seat{
-    margin-top: 44px;
+    margin-top: 36px;
     container-type: inline-size;
   }
   .agentbox-card{
@@ -278,10 +447,11 @@
     .card-note .kbd-hint{ display: none; }
   }
 
-  /* sections */
+  /* ---------------- sections ---------------- */
+
   section{ padding-top: 68px; }
   h2{
-    font-size: 1.4rem;
+    font-size: 1.55rem;
     font-weight: 700;
     line-height: 1.2;
     margin: 0 0 4px;
@@ -308,6 +478,7 @@
   figure{
     margin: 26px 0;
     container-type: inline-size;
+    transition: width .2s ease;
 
     & figcaption{
       margin-top: 10px;
@@ -317,7 +488,16 @@
     }
   }
 
-  /* agentbox: mascot + shell snippet */
+  /* wide screens: let the mocks use the gutter the prose should not */
+  @media (min-width: 1200px){
+    main section figure{ width: calc(100% + 9em); }
+  }
+  @media (min-width: 1500px){
+    main section figure{ width: calc(100% + 15em); }
+  }
+
+  /* ---------------- agentbox: mascot + shell snippet ---------------- */
+
   .mascot{
     float: right;
     width: 200px;
@@ -354,7 +534,8 @@
     & .str{ color: var(--snapper); }
   }
 
-  /* snapper: annotated capture */
+  /* ---------------- snapper: annotated capture ---------------- */
+
   .capture{
     position: relative;
     border: 1px solid var(--card-line);
@@ -489,7 +670,8 @@
     }
   }
 
-  /* grabbit: download queue */
+  /* ---------------- grabbit: download queue ---------------- */
+
   .queue{
     border: 1px solid var(--card-line);
     border-radius: 10px;
@@ -567,7 +749,8 @@
     }
   }
 
-  /* archive */
+  /* ---------------- archive ---------------- */
+
   .archive{
     list-style: none;
     margin: 0;
@@ -593,7 +776,42 @@
     .archive .desc{ text-align: left; }
   }
 
-  /* footer */
+  /* ---------------- close ---------------- */
+
+  .ways{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 24px 0 0;
+    padding: 0;
+    list-style: none;
+
+    & a{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 0.8125rem;
+      text-decoration: none;
+      color: var(--ink);
+      background: var(--card);
+      border: 1px solid var(--card-line);
+      border-bottom-width: 2px;
+      border-radius: 7px;
+      padding: 9px 14px;
+      transition: border-color .15s ease, transform .15s ease;
+
+      &:hover{ border-color: var(--agentbox); transform: translateY(-1px); }
+      &:focus-visible{ outline: 2px solid var(--agentbox); outline-offset: 2px; }
+    }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .ways a{ transition: none; }
+    .ways a:hover{ transform: none; }
+  }
+
+  /* ---------------- footer ---------------- */
+
   footer{
     margin-top: 76px;
     padding-top: 28px;
@@ -637,18 +855,47 @@
     <path d="M12 3.5v9.5M8.2 9.6l3.8 3.8 3.8-3.8"/>
     <path d="M4 14.5v2.5A3.5 3.5 0 0 0 7.5 20.5h9a3.5 3.5 0 0 0 3.5-3.5v-2.5"/>
   </symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24">
+    <rect x="3" y="5.2" width="18" height="13.6" rx="2.4"/>
+    <path d="m3.8 6.6 8.2 6 8.2-6"/>
+  </symbol>
+  <symbol id="i-code" viewBox="0 0 24 24">
+    <path d="m8.6 8.4-4.4 3.6 4.4 3.6M15.4 8.4l4.4 3.6-4.4 3.6M13.4 5.2l-2.8 13.6"/>
+  </symbol>
 </svg>
 
-<header class="masthead col">
-  <h1>Boris Milner</h1>
-  <p class="sub">software engineer &middot; Israel</p>
-  <p class="lede">
-    Hi, I'm Boris. I build tools for the Linux desktop, and they all come
-    from the same itch: I hate being interrupted for nothing, and I hate
-    finding out too late that something needed me. So I write software that
-    handles what it can on its own, and when it really needs a human, costs
-    you two seconds instead of a context switch.
-  </p>
+<header class="masthead">
+  <div class="words">
+    <h1>Boris Milner</h1>
+    <p class="sub">backend and infrastructure engineer &middot; Tel Aviv</p>
+    <p class="lede">
+      Fourteen years spent close to the metal and close to the data: validating
+      silicon, taking apart binaries and the protocols they speak, moving data
+      at the scale where the obvious approach quietly stops working, and
+      building the platforms other engineers then build on. Right now it is
+      container image security, in Go.
+    </p>
+    <p class="lede">
+      The three tools below are what I build when nobody assigns the work. Each
+      one comes from the same complaint: software interrupts me for nothing,
+      then fails to tell me the one thing I actually needed to know. So these
+      handle what they can on their own, and when they genuinely need a human,
+      they cost you two seconds instead of a context switch.
+    </p>
+  </div>
+  <div class="art-wrap">
+    <div class="art">
+      <img src="boris.webp" width="1024" height="768" loading="eager"
+           alt="Cartoon of Boris mid-leap hugging an oversized keyboard, trailing floppy disks and an old beige tower, with world landmarks and streams of binary behind him.">
+    </div>
+    <ul class="bubbles" aria-label="Where I have worked and studied">
+      <li class="bubble"><b>Intel</b><span class="kind">silicon</span></li>
+      <li class="bubble"><b>Rafael</b><span class="kind">defense</span></li>
+      <li class="bubble"><b>Nano-<br>Dimension</b><span class="kind">AI core</span></li>
+      <li class="bubble"><b>Minimus</b><span class="kind">containers</span></li>
+      <li class="bubble"><b>Technion</b><span class="kind">B.Sc.</span></li>
+    </ul>
+  </div>
 </header>
 
 <div class="card-seat col">
@@ -675,7 +922,7 @@
   <section id="agentbox" class="col">
     <h2 tabindex="-1"><svg class="glyph" aria-hidden="true"><use href="#i-agentbox"/></svg>AgentBox</h2>
     <p class="role">desktop interaction hub for AI agents &middot; Go, Linux/X11</p>
-    <img class="mascot" src="agentbox-mascot.webp" width="480" height="398"
+    <img class="mascot" src="agentbox-mascot.webp" width="480" height="398" loading="lazy"
          alt="AgentBox's robot mascot holding up a card that asks: perform a file integrity check now? Yes / No">
     <p>
       An agent works for twenty minutes while you are somewhere else. The
@@ -702,10 +949,10 @@ agentbox notify --level success --title <span class="str">"release is live"</spa
       code, so a shell script can branch on a human without parsing anything.</figcaption>
     </figure>
     <p>
-      There are twenty tools: questions, forms, diff reviews with approve and
-      request-changes, progress bars, spoken lines, masked secret entry. All
-      of them over MCP and the same twenty from the shell. And all of it
-      local: no cloud, no account, nothing leaves the machine.
+      Twenty tools: questions, forms, diff reviews with approve and
+      request-changes, progress bars, spoken lines, masked secret entry. All of
+      them over MCP, and the same twenty from the shell. All of it local: no
+      cloud, no account, nothing leaves the machine.
     </p>
     <p class="meta"><a href="https://github.com/borismilner/agentbox">github.com/borismilner/agentbox</a></p>
   </section>
@@ -714,12 +961,11 @@ agentbox notify --level success --title <span class="str">"release is live"</spa
     <h2 tabindex="-1"><svg class="glyph" aria-hidden="true"><use href="#i-snapper"/></svg>snapper</h2>
     <p class="role">screenshot capture and annotation &middot; Go, Gio</p>
     <p>
-      snapper takes Flameshot's in-overlay speed and Snagit's magnifier
-      precision as starting points, then adds the editor I always wanted:
-      one where nothing ever flattens. Every arrow, label and redaction
-      stays a separate object you can reselect, restyle or move next week.
-      A scene saves as a <span class="mono">.snap</span> project, not a
-      baked PNG.
+      snapper starts from Flameshot's in-overlay speed and Snagit's magnifier
+      precision, then adds the editor I always wanted: one where nothing ever
+      flattens. Every arrow, label and redaction stays a separate object you can
+      reselect, restyle or move next week. A scene saves as a
+      <span class="mono">.snap</span> project, not a baked PNG.
     </p>
     <figure>
       <div class="capture" role="img" aria-label="Mock of the snapper editor: a captured settings window with a selected arrow annotation and a label pill">
@@ -764,7 +1010,7 @@ agentbox notify --level success --title <span class="str">"release is live"</spa
       a crash or a reboot, multi-part archives grouped into one package.
     </p>
     <p>
-      My favorite part is the free-hoster machinery. A countdown timer? It
+      My favourite part is the free-hoster machinery. A countdown timer? It
       waits it out in the background. A captcha? It opens a real browser
       window, lets you solve it, then carries the whole solved session
       (cookies, TLS fingerprint and all) into the download. You do the two
@@ -798,8 +1044,8 @@ agentbox notify --level success --title <span class="str">"release is live"</spa
     </figure>
     <p>
       New sites are small YAML or JavaScript profiles dropped in a folder, no
-      rebuild. And everything the desktop app can do, a script or an AI agent
-      can do too, through one control API over MCP and HTTP/JSON-RPC.
+      rebuild. And everything the desktop app can do, a script or an agent can
+      do too, through one control API over MCP and HTTP/JSON-RPC.
     </p>
     <p class="meta"><a href="https://github.com/borismilner/grabbit">github.com/borismilner/grabbit</a></p>
   </section>
@@ -830,11 +1076,15 @@ agentbox notify --level success --title <span class="str">"release is live"</spa
     <h2 tabindex="-1">Say hello</h2>
     <p>
       All three tools are open source, and the READMEs are the real
-      documentation. If one would be useful to you, take it. If you want to
-      change it, issues and patches are welcome. And if you are hiring
-      people who sweat this kind of detail, my inbox is open:
-      <a href="mailto:boris.milner@gmail.com">boris.milner@gmail.com</a>.
+      documentation. If one of them would be useful to you, take it. If you
+      want to change it, issues and patches are welcome.
     </p>
+    <p>Anything else, write to me.</p>
+    <ul class="ways">
+      <li><a href="mailto:boris.milner@gmail.com"><svg class="glyph" aria-hidden="true"><use href="#i-mail"/></svg>boris.milner@gmail.com</a></li>
+      <li><a href="https://github.com/borismilner"><svg class="glyph" aria-hidden="true"><use href="#i-code"/></svg>GitHub</a></li>
+      <li><a href="https://gitlab.com/fu-bar/from-github"><svg class="glyph" aria-hidden="true"><use href="#i-code"/></svg>GitLab</a></li>
+    </ul>
   </section>
 </main>
 
